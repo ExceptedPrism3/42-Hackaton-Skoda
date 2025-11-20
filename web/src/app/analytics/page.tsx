@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
     BarChart,
     Bar,
@@ -208,25 +209,27 @@ export default function AnalyticsPage() {
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">🏆 Top Learners</h3>
                     <div className="space-y-4">
                         {topLearners.map((learner, index) => (
-                            <div key={learner.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? "bg-yellow-100 text-yellow-700" :
+                            <Link key={learner.id} href={`/employee/${learner.id}`}>
+                                <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? "bg-yellow-100 text-yellow-700" :
                                             index === 1 ? "bg-slate-200 text-slate-700" :
                                                 index === 2 ? "bg-amber-100 text-amber-800" :
                                                     "bg-slate-100 text-slate-500"
-                                        }`}>
-                                        {index + 1}
+                                            }`}>
+                                            {index + 1}
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-slate-900 dark:text-white text-sm group-hover:text-emerald-600 transition-colors">{learner.name}</p>
+                                            <p className="text-xs text-slate-500">{learner.department}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-medium text-slate-900 dark:text-white text-sm">{learner.name}</p>
-                                        <p className="text-xs text-slate-500">{learner.department}</p>
+                                    <div className="text-right">
+                                        <span className="block font-bold text-emerald-600 dark:text-emerald-400">{learner.count}</span>
+                                        <span className="text-[10px] text-slate-400 uppercase">Courses</span>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <span className="block font-bold text-emerald-600 dark:text-emerald-400">{learner.count}</span>
-                                    <span className="text-[10px] text-slate-400 uppercase">Courses</span>
-                                </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 </div>

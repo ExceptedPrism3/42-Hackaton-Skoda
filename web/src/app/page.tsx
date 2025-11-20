@@ -5,14 +5,19 @@ import Link from "next/link";
 import { Search, User, ChevronRight } from "lucide-react";
 import usersData from "@/data/users.json";
 
+import { useSearchParams } from "next/navigation";
+
 export default function HRSearchPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") || "";
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [displayCount, setDisplayCount] = useState(50);
 
   const filteredUsers = useMemo(() => {
     return usersData.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.id.includes(searchTerm)
+      user.id.includes(searchTerm) ||
+      user.department.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm]);
 
