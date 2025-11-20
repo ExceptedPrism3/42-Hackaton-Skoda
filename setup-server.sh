@@ -136,7 +136,7 @@ module.exports = {
     cwd: process.cwd() + '/web',
     env: {
       NODE_ENV: 'production',
-      PORT: 3001,
+      PORT: 3002,
       NEXT_PUBLIC_BASE_PATH: '/skoda'
     },
     error_file: process.cwd() + '/logs/pm2-error.log',
@@ -162,8 +162,8 @@ sudo tee /etc/apache2/sites-available/skoda.conf > /dev/null << EOF
     
     # Main application
     <Location /skoda>
-        ProxyPass http://localhost:3001/skoda
-        ProxyPassReverse http://localhost:3001/skoda
+        ProxyPass http://localhost:3002/skoda
+        ProxyPassReverse http://localhost:3002/skoda
         ProxyPassReverse /
         
         # Headers for proper routing
@@ -173,8 +173,8 @@ sudo tee /etc/apache2/sites-available/skoda.conf > /dev/null << EOF
     
     # Static assets
     <Location /skoda/_next>
-        ProxyPass http://localhost:3001/skoda/_next
-        ProxyPassReverse http://localhost:3001/skoda/_next
+        ProxyPass http://localhost:3002/skoda/_next
+        ProxyPassReverse http://localhost:3002/skoda/_next
     </Location>
     
     # Error and access logs

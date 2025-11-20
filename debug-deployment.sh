@@ -6,8 +6,8 @@ echo "🔍 Debugging S³ Deployment"
 echo "=========================="
 echo ""
 
-echo "1. Checking if Next.js app is running on port 3001..."
-curl -s http://localhost:3001/skoda | head -20 || echo "❌ App not responding on localhost:3001"
+echo "1. Checking if Next.js app is running on port 3002..."
+curl -s http://localhost:3002/skoda | head -20 || echo "❌ App not responding on localhost:3002"
 echo ""
 
 echo "2. Checking PM2 status..."
@@ -18,8 +18,8 @@ echo "3. Checking PM2 logs..."
 pm2 logs skoda-web --lines 20 --nostream
 echo ""
 
-echo "4. Checking if port 3001 is listening..."
-netstat -tlnp | grep 3001 || ss -tlnp | grep 3001
+echo "4. Checking if port 3002 is listening..."
+netstat -tlnp | grep 3002 || ss -tlnp | grep 3002
 echo ""
 
 echo "5. Checking Apache configuration..."
