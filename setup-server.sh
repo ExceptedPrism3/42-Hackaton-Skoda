@@ -91,7 +91,7 @@ pip install --upgrade pip
 
 # Install all required Python dependencies
 echo "Installing Python dependencies..."
-pip install pandas transformers scikit-learn numpy scipy openpyxl sentencepiece
+pip install pandas transformers scikit-learn numpy scipy openpyxl sentencepiece pydantic
 
 # Note: torch is optional but recommended for better translation performance
 # Uncomment the line below if you want to install PyTorch (large download ~2GB)
