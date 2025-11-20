@@ -106,10 +106,21 @@ def main():
             random.seed(int(user_id_str)) 
             mock_name = f"{random.choice(first_names)} {random.choice(last_names)}"
             
+            # Infer Department based on skills/courses
+            department = "Operations" # Default
+            if "python" in skills or "java" in str(completed).lower():
+                department = "IT & Digital"
+            elif "finance" in str(completed).lower() or "controlling" in str(completed).lower():
+                department = "Finance"
+            elif "hr" in str(completed).lower() or "lidská práva" in str(completed).lower():
+                department = "Human Resources"
+            elif "quality" in str(completed).lower() or "qms" in str(completed).lower():
+                department = "Quality Assurance"
+            
             users[user_id_str] = {
                 "id": user_id_str,
                 "name": mock_name, 
-                "department": "Operations", # Mock department
+                "department": department,
                 "role": "Specialist",
                 "completed_courses": completed,
                 "skills": skills
