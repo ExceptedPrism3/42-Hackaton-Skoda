@@ -98,6 +98,96 @@ The project consists of two main components:
 
 For the login page, you can use any username and password - it's a demo system.
 
+## 🚀 Deployment
+
+### Production Deployment with Apache
+
+To deploy the application on an Ubuntu server with Apache as a reverse proxy:
+
+1. **Clone and navigate to the project**
+   ```bash
+   git clone https://github.com/ExceptedPrism3/Skoda.git
+   cd Skoda
+   ```
+
+2. **Run the automated setup script**
+   ```bash
+   chmod +x setup-server.sh
+   ./setup-server.sh
+   ```
+
+   The script will:
+   - Install Node.js 20+ and Python dependencies
+   - Set up the Python virtual environment
+   - Process data files (if present in `data/` folder)
+   - Build the Next.js application
+   - Configure PM2 for process management
+   - Set up Apache reverse proxy configuration
+   - Start the application
+
+3. **Manual setup (if needed)**
+
+   If you prefer manual setup or need to customize:
+
+   ```bash
+   # Set up Python environment
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install pandas transformers scikit-learn numpy scipy openpyxl sentencepiece pydantic
+   
+   # Process data
+   export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
+   python -m s3.ingest
+   
+   # Build Next.js app
+   cd web
+   npm install
+   NEXT_PUBLIC_BASE_PATH=/skoda npm run build
+   cd ..
+   
+   # Start with PM2
+   pm2 start ecosystem.config.js
+   pm2 save
+   pm2 startup  # Follow the output to enable auto-start on boot
+   ```
+
+4. **Apache Configuration**
+
+   The setup script automatically configures Apache. If you have an existing SSL VirtualHost, it will add the `/skoda` location blocks to it. Otherwise, it creates a new HTTP-only configuration.
+
+   The app runs on port **3002** by default (configurable in `ecosystem.config.js`).
+
+5. **Access the application**
+
+   - HTTP: `http://your-server-ip/skoda`
+   - HTTPS: `https://your-server-ip/skoda` (if SSL is configured)
+
+### Important Notes
+
+- **Port Configuration**: The app uses port 3002 by default. Make sure this port is available or update `ecosystem.config.js` and Apache configuration accordingly.
+- **Base Path**: The application is configured to run under `/skoda` subpath. To change this, update `NEXT_PUBLIC_BASE_PATH` in both the build command and `ecosystem.config.js`.
+- **SSL/HTTPS**: If you have SSL certificates, ensure your Apache SSL VirtualHost includes the `/skoda` location blocks (the setup script handles this automatically).
+- **Data Files**: Place your data files in the `data/` folder before running the setup script, or run the data ingestion manually after setup.
+
+### Useful Commands
+
+```bash
+# PM2 Management
+pm2 status              # Check app status
+pm2 logs skoda-web      # View logs
+pm2 restart skoda-web   # Restart app
+pm2 stop skoda-web      # Stop app
+
+# Apache Logs
+sudo tail -f /var/log/apache2/skoda_error.log
+sudo tail -f /var/log/apache2/skoda_access.log
+
+# Rebuild after code changes
+cd web
+NEXT_PUBLIC_BASE_PATH=/skoda npm run build
+pm2 restart skoda-web
+```
+
 ## 📊 Data Sources
 
 The platform uses real Škoda Auto data from multiple sources:

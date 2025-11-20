@@ -149,43 +149,77 @@ module.exports = {
 };
 EOF
 
-# Step 8: Create Apache configuration
-echo -e "\n${YELLOW}Step 8: Creating Apache configuration...${NC}"
-CURRENT_DIR=$(pwd)
-sudo tee /etc/apache2/sites-available/skoda.conf > /dev/null << EOF
+# Step 8: Configure Apache
+echo -e "\n${YELLOW}Step 8: Configuring Apache...${NC}"
+
+# Check if SSL VirtualHost exists
+SSL_CONF=$(sudo grep -l "VirtualHost.*443" /etc/apache2/sites-enabled/*.conf 2>/dev/null | head -1)
+
+if [ ! -z "$SSL_CONF" ]; then
+    echo "Found existing SSL VirtualHost: $SSL_CONF"
+    echo "Adding /skoda location blocks to existing SSL configuration..."
+    
+    # Check if already configured
+    if ! sudo grep -q "Location /skoda" "$SSL_CONF"; then
+        # Create backup
+        BACKUP_FILE="${SSL_CONF}.backup.$(date +%Y%m%d_%H%M%S)"
+        sudo cp "$SSL_CONF" "$BACKUP_FILE"
+        echo "Backup created: $BACKUP_FILE"
+        
+        # Add location blocks before closing VirtualHost tag
+        sudo sed -i '/<\/VirtualHost>/i\
+    # Proxy to Skoda Next.js application\
+    ProxyPreserveHost On\
+    ProxyRequests Off\
+\
+    <Location /skoda>\
+        ProxyPass http://localhost:3002/skoda\
+        ProxyPassReverse http://localhost:3002/skoda\
+        RequestHeader set X-Forwarded-Proto "https"\
+        RequestHeader set X-Forwarded-Prefix "/skoda"\
+    </Location>\
+\
+    <Location /skoda/_next>\
+        ProxyPass http://localhost:3002/skoda/_next\
+        ProxyPassReverse http://localhost:3002/skoda/_next\
+    </Location>\
+' "$SSL_CONF"
+        echo "✓ Added /skoda configuration to SSL VirtualHost"
+    else
+        echo "✓ /skoda location already configured in SSL VirtualHost"
+    fi
+else
+    echo "No SSL VirtualHost found, creating HTTP-only configuration..."
+    sudo tee /etc/apache2/sites-available/skoda.conf > /dev/null << EOF
 <VirtualHost *:80>
     ServerName 89.168.52.201
     
-    # Proxy to Next.js application
     ProxyPreserveHost On
     ProxyRequests Off
     
-    # Main application
     <Location /skoda>
         ProxyPass http://localhost:3002/skoda
         ProxyPassReverse http://localhost:3002/skoda
-        ProxyPassReverse /
-        
-        # Headers for proper routing
         RequestHeader set X-Forwarded-Proto "http"
         RequestHeader set X-Forwarded-Prefix "/skoda"
     </Location>
     
-    # Static assets
     <Location /skoda/_next>
         ProxyPass http://localhost:3002/skoda/_next
         ProxyPassReverse http://localhost:3002/skoda/_next
     </Location>
     
-    # Error and access logs
     ErrorLog \${APACHE_LOG_DIR}/skoda_error.log
     CustomLog \${APACHE_LOG_DIR}/skoda_access.log combined
 </VirtualHost>
 EOF
+    sudo a2ensite skoda.conf
+fi
 
-# Enable the site
-sudo a2ensite skoda.conf
+# Test Apache configuration
+sudo apache2ctl configtest
 sudo systemctl reload apache2
+echo "✓ Apache configured and reloaded"
 
 # Step 9: Start the application with PM2
 echo -e "\n${YELLOW}Step 9: Starting application with PM2...${NC}"
