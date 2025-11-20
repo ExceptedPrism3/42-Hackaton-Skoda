@@ -51,16 +51,23 @@ export default function AnalyticsPage() {
     }, []);
 
     const learningTrendsData = useMemo(() => {
-        // Mocking trend data based on "completed_courses" count for visualization
-        // In a real app, we'd use actual completion dates
-        return [
-            { month: "Jan", hours: 120 },
-            { month: "Feb", hours: 150 },
-            { month: "Mar", hours: 180 },
-            { month: "Apr", hours: 220 },
-            { month: "May", hours: 250 },
-            { month: "Jun", hours: 300 },
-        ];
+        const months: Record<string, number> = {};
+
+        usersData.forEach(user => {
+            user.recent_courses.forEach(course => {
+                if (course.date) {
+                    const date = new Date(course.date);
+                    const month = date.toLocaleString('default', { month: 'short' });
+                    months[month] = (months[month] || 0) + 1;
+                }
+            });
+        });
+
+        // Sort by month order
+        const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return Object.entries(months)
+            .map(([month, count]) => ({ month, courses: count }))
+            .sort((a, b) => monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month));
     }, []);
 
     return (
@@ -165,7 +172,7 @@ export default function AnalyticsPage() {
                                     contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                     itemStyle={{ color: '#1e293b' }}
                                 />
-                                <Area type="monotone" dataKey="hours" stroke="#3b82f6" fillOpacity={1} fill="url(#colorHours)" />
+                                <Area type="monotone" dataKey="courses" stroke="#3b82f6" fillOpacity={1} fill="url(#colorHours)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
