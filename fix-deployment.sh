@@ -6,16 +6,13 @@ echo "🔧 Fixing S³ Deployment Issues"
 echo "==============================="
 echo ""
 
-# Step 1: Kill the process using port 3000
-echo "1. Finding and stopping process on port 3000..."
-PID=$(lsof -ti:3000 || fuser 3000/tcp 2>/dev/null | awk '{print $1}' || netstat -tlnp 2>/dev/null | grep :3000 | awk '{print $7}' | cut -d'/' -f1 | head -1)
-if [ ! -z "$PID" ]; then
-    echo "   Found process $PID on port 3000, killing it..."
-    kill -9 $PID 2>/dev/null || sudo kill -9 $PID 2>/dev/null
-    sleep 2
-    echo "   ✓ Process killed"
+# Step 1: Check if port 3001 is available
+echo "1. Checking if port 3001 is available..."
+if lsof -ti:3001 > /dev/null 2>&1 || fuser 3001/tcp > /dev/null 2>&1; then
+    echo "   ⚠️  Port 3001 is already in use, please free it first"
+    exit 1
 else
-    echo "   ✓ No process found on port 3000"
+    echo "   ✓ Port 3001 is available"
 fi
 echo ""
 
@@ -36,15 +33,15 @@ sudo tee /etc/apache2/sites-available/skoda.conf > /dev/null << 'EOF'
     ProxyRequests Off
     
     <Location /skoda>
-        ProxyPass http://localhost:3000/skoda
-        ProxyPassReverse http://localhost:3000/skoda
+        ProxyPass http://localhost:3001/skoda
+        ProxyPassReverse http://localhost:3001/skoda
         RequestHeader set X-Forwarded-Proto "http"
         RequestHeader set X-Forwarded-Prefix "/skoda"
     </Location>
     
     <Location /skoda/_next>
-        ProxyPass http://localhost:3000/skoda/_next
-        ProxyPassReverse http://localhost:3000/skoda/_next
+        ProxyPass http://localhost:3001/skoda/_next
+        ProxyPassReverse http://localhost:3001/skoda/_next
     </Location>
 </VirtualHost>
 
@@ -60,15 +57,15 @@ sudo tee /etc/apache2/sites-available/skoda.conf > /dev/null << 'EOF'
     ProxyRequests Off
     
     <Location /skoda>
-        ProxyPass http://localhost:3000/skoda
-        ProxyPassReverse http://localhost:3000/skoda
+        ProxyPass http://localhost:3001/skoda
+        ProxyPassReverse http://localhost:3001/skoda
         RequestHeader set X-Forwarded-Proto "https"
         RequestHeader set X-Forwarded-Prefix "/skoda"
     </Location>
     
     <Location /skoda/_next>
-        ProxyPass http://localhost:3000/skoda/_next
-        ProxyPassReverse http://localhost:3000/skoda/_next
+        ProxyPass http://localhost:3001/skoda/_next
+        ProxyPassReverse http://localhost:3001/skoda/_next
     </Location>
 </VirtualHost>
 EOF
@@ -103,7 +100,7 @@ echo ""
 # Step 8: Verify
 echo "8. Verifying deployment..."
 sleep 2
-if curl -s http://localhost:3000/skoda | grep -q "Employee Skill Search\|S³\|Skoda"; then
+if curl -s http://localhost:3001/skoda | grep -q "Employee Skill Search\|S³\|Skoda"; then
     echo "   ✅ Next.js app is responding correctly!"
 else
     echo "   ⚠️  App may not be responding correctly, check logs:"

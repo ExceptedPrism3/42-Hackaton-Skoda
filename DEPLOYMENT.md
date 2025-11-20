@@ -109,8 +109,8 @@ Add the following configuration:
     
     # Main application
     <Location /skoda>
-        ProxyPass http://localhost:3000/skoda
-        ProxyPassReverse http://localhost:3000/skoda
+        ProxyPass http://localhost:3001/skoda
+        ProxyPassReverse http://localhost:3001/skoda
         ProxyPassReverse /
         
         # Headers for proper routing
@@ -120,8 +120,8 @@ Add the following configuration:
     
     # Static assets
     <Location /skoda/_next>
-        ProxyPass http://localhost:3000/skoda/_next
-        ProxyPassReverse http://localhost:3000/skoda/_next
+        ProxyPass http://localhost:3001/skoda/_next
+        ProxyPassReverse http://localhost:3001/skoda/_next
     </Location>
     
     # Error and access logs (optional)
@@ -155,7 +155,7 @@ module.exports = {
     cwd: '/var/www/skoda/web',
     env: {
       NODE_ENV: 'production',
-      PORT: 3000,
+      PORT: 3001,
       NEXT_PUBLIC_BASE_PATH: '/skoda'
     },
     error_file: '/var/www/skoda/logs/pm2-error.log',
@@ -213,12 +213,12 @@ pm2 startup
 
 3. **Verify Next.js is running:**
    ```bash
-   curl http://localhost:3000/skoda
+   curl http://localhost:3001/skoda
    ```
 
-4. **Check if port 3000 is accessible:**
+4. **Check if port 3001 is accessible:**
    ```bash
-   netstat -tlnp | grep 3000
+   netstat -tlnp | grep 3001
    ```
 
 ### If you need to rebuild:
