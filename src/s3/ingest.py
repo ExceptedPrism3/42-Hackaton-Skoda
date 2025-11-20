@@ -97,9 +97,18 @@ def main():
                 elif "python" in course_lower:
                     skills["python"] = "beginner"
             
+            # Realistic Mock Names
+            first_names = ["James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda", "William", "Elizabeth", "David", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa", "Matthew", "Betty", "Anthony", "Margaret", "Mark", "Sandra"]
+            last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"]
+            
+            import random
+            # Seed with user_id to ensure consistent names across runs
+            random.seed(int(user_id_str)) 
+            mock_name = f"{random.choice(first_names)} {random.choice(last_names)}"
+            
             users[user_id_str] = {
                 "id": user_id_str,
-                "name": f"Employee {user_id_str}", # Mock name
+                "name": mock_name, 
                 "department": "Operations", # Mock department
                 "role": "Specialist",
                 "completed_courses": completed,

@@ -23,11 +23,11 @@ export default function DashboardLayout({
                 <Search size={20} />
                 <span className="font-medium">Employee Search</span>
               </Link>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+              <Link href="/" className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
                 <LayoutDashboard size={20} />
                 <span className="font-medium">Department Overview</span>
               </Link>
-              <Link href="#" className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
+              <Link href="/" className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
                 <Settings size={20} />
                 <span className="font-medium">Settings</span>
               </Link>
@@ -39,8 +39,8 @@ export default function DashboardLayout({
                   <User size={16} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Anna</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Product Manager</p>
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Maria</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">HR Manager</p>
                 </div>
               </div>
             </div>
