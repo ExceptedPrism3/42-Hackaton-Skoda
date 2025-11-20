@@ -38,13 +38,30 @@ export default function DepartmentOverviewPage() {
 
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Department Overview</h1>
+            <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Department Overview</h1>
+                <div className="group relative">
+                    <div className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-help transition-colors text-slate-400 hover:text-emerald-600">
+                        <Users size={20} />
+                    </div>
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 w-72 p-4 bg-slate-900 text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                        <p className="font-semibold mb-1">Strategic Heat Map</p>
+                        <p className="text-slate-300 leading-relaxed">
+                            Visualize skill health across your organization. Identify "Critical Gaps" to allocate training budget effectively.
+                            <br /><br />
+                            <strong>Click a department</strong> to drill down into specific employees.
+                        </p>
+                        {/* Arrow */}
+                        <div className="absolute right-full top-1/2 -translate-y-1/2 border-8 border-transparent border-r-slate-900"></div>
+                    </div>
+                </div>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex flex-wrap justify-center gap-6">
                 {Object.entries(departments).map(([name, data]) => (
-                    <div key={name} className="bg-white dark:bg-slate-950 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-lg transition-all">
+                    <div key={name} className="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] bg-white dark:bg-slate-950 p-6 rounded-xl border border-slate-200 dark:border-slate-800 hover:shadow-lg hover:border-emerald-500 transition-all cursor-pointer group">
                         <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+                            <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
                                 <Users size={24} />
                             </div>
                             <span className="text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-600 dark:text-slate-400">

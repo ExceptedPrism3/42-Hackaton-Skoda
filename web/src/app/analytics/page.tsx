@@ -70,6 +70,31 @@ export default function AnalyticsPage() {
             .sort((a, b) => monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month));
     }, []);
 
+    const topLearners = useMemo(() => {
+        return [...usersData]
+            .sort((a, b) => b.completed_courses.length - a.completed_courses.length)
+            .slice(0, 5)
+            .map(user => ({
+                id: user.id,
+                name: user.name,
+                department: user.department,
+                count: user.completed_courses.length
+            }));
+    }, []);
+
+    const popularCourses = useMemo(() => {
+        const counts: Record<string, number> = {};
+        usersData.forEach(user => {
+            user.completed_courses.forEach(course => {
+                counts[course] = (counts[course] || 0) + 1;
+            });
+        });
+        return Object.entries(counts)
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value)
+            .slice(0, 5);
+    }, []);
+
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8">
             <div className="flex flex-col gap-2">
@@ -174,6 +199,59 @@ export default function AnalyticsPage() {
                                 />
                                 <Area type="monotone" dataKey="courses" stroke="#3b82f6" fillOpacity={1} fill="url(#colorHours)" />
                             </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Top Learners Leaderboard */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">🏆 Top Learners</h3>
+                    <div className="space-y-4">
+                        {topLearners.map((learner, index) => (
+                            <div key={learner.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${index === 0 ? "bg-yellow-100 text-yellow-700" :
+                                            index === 1 ? "bg-slate-200 text-slate-700" :
+                                                index === 2 ? "bg-amber-100 text-amber-800" :
+                                                    "bg-slate-100 text-slate-500"
+                                        }`}>
+                                        {index + 1}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-slate-900 dark:text-white text-sm">{learner.name}</p>
+                                        <p className="text-xs text-slate-500">{learner.department}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <span className="block font-bold text-emerald-600 dark:text-emerald-400">{learner.count}</span>
+                                    <span className="text-[10px] text-slate-400 uppercase">Courses</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Popular Courses */}
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">🔥 Most Popular Courses</h3>
+                    <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={popularCourses} layout="vertical" margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                                <XAxis type="number" hide />
+                                <YAxis
+                                    dataKey="name"
+                                    type="category"
+                                    width={150}
+                                    tick={{ fontSize: 11, fill: '#64748b' }}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: 'transparent' }}
+                                    contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    itemStyle={{ color: '#1e293b' }}
+                                />
+                                <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
+                            </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
