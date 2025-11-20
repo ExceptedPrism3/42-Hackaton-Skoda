@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useTransition } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 interface User {
@@ -20,18 +20,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [, startTransition] = useTransition();
     const router = useRouter();
     const pathname = usePathname();
 
-    // Check for persisted session on mount
+    const [isLoading, setIsLoading] = useState(false);
+
     useEffect(() => {
+        if (typeof window === "undefined") {
+            return;
+        }
         const storedUser = localStorage.getItem("s3_user");
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            startTransition(() => setUser(JSON.parse(storedUser)));
         }
-    }, []);
-
-    const [isLoading, setIsLoading] = useState(false);
+    }, [startTransition]);
 
     const login = (username: string) => {
         setIsLoading(true);

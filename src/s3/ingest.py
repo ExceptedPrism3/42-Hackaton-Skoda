@@ -168,6 +168,28 @@ def generate_mock_name(user_id: str) -> str:
     return f"{first} {last}"
 
 
+def infer_department(role: str, position: str) -> str:
+    """Infer department from role and position keywords."""
+    text = (f"{role} {position}").lower()
+    
+    if any(w in text for w in ["logistics", "supply", "warehouse", "logistik"]):
+        return "Logistics"
+    if any(w in text for w in ["quality", "audit", "control", "kvalit"]):
+        return "Quality Control"
+    if any(w in text for w in ["it", "software", "developer", "data", "digital", "cyber", "system"]):
+        return "IT & Digital"
+    if any(w in text for w in ["hr", "human", "people", "recruitment", "talent", "education", "pedagog", "teacher", "učitel"]):
+        return "HR & Academy"
+    if any(w in text for w in ["production", "assembly", "montáž", "výrob", "operator"]):
+        return "Production"
+    if any(w in text for w in ["maintenance", "údržb", "service", "repair"]):
+        return "Maintenance"
+    if any(w in text for w in ["finance", "account", "cost", "ekonom"]):
+        return "Finance"
+    
+    return "Operational Excellence"  # Default fallback
+
+
 def translate_batch(texts: List[str]) -> List[str]:
     """Translate a batch of texts at once for efficiency."""
     if not texts or translator_model is None or translator_tokenizer is None:
@@ -486,8 +508,8 @@ def build_user_profiles() -> List[Dict[str, Any]]:
         users.append(
             {
                 "id": user_id,
-                "name": profile.get("user_name") or generate_mock_name(user_id),
-                "department": "Skoda Academy" if "Academy" in profile["planned_position"] else "Operational Excellence",
+                "name": f"Employee {user_id}", # Reverted to ID as requested
+                "department": infer_department(profile["profession"], profile["planned_position"]),
                 "role": profile["profession"],
                 "position": profile["planned_position"],
                 "experience_years": experience_years,

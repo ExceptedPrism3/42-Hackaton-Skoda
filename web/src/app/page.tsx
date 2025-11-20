@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, User, ChevronRight } from "lucide-react";
 import usersData from "@/data/users.json";
@@ -8,10 +8,12 @@ import usersData from "@/data/users.json";
 export default function HRSearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredUsers = usersData.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.id.includes(searchTerm)
-  );
+  const filteredUsers = useMemo(() => {
+    return usersData.filter(user =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.id.includes(searchTerm)
+    );
+  }, [searchTerm]);
 
   return (
     <div className="space-y-6">
@@ -41,7 +43,8 @@ export default function HRSearchPage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-slate-900 dark:text-slate-100">{user.name}</h3>
-                  <p className="text-xs text-slate-500">{user.department} • ID: {user.id}</p>
+                  <p className="text-xs text-slate-500">{user.department} • {user.role}</p>
+                  <p className="text-xs text-slate-500">Experience: {user.experience_years?.toFixed?.(1) || user.experience_years} yrs</p>
                 </div>
               </div>
               <ChevronRight size={16} className="text-slate-300 group-hover:text-emerald-500 transition-colors" />
@@ -52,7 +55,7 @@ export default function HRSearchPage() {
 
       {filteredUsers.length === 0 && (
         <div className="text-center py-12 text-slate-500">
-          No employees found matching "{searchTerm}"
+          No employees found matching &ldquo;{searchTerm}&rdquo;
         </div>
       )}
     </div>

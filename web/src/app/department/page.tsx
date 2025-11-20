@@ -1,6 +1,6 @@
 "use client";
 
-import { PieChart, Users, AlertTriangle, CheckCircle } from "lucide-react";
+import { Users, AlertTriangle } from "lucide-react";
 import usersData from "@/data/users.json";
 
 export default function DepartmentOverviewPage() {

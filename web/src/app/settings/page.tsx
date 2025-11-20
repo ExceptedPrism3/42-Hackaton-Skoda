@@ -1,10 +1,10 @@
 "use client";
 
-import { Bell, Lock, User, Globe, Moon, Info } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Lock, User, Moon } from "lucide-react";
+import { useThemeMode } from "@/components/theme-provider";
 
 export default function SettingsPage() {
-    const { theme, setTheme } = useTheme();
+    const { theme, setTheme } = useThemeMode();
 
     return (
         <div className="max-w-4xl mx-auto space-y-8">
@@ -35,29 +35,12 @@ export default function SettingsPage() {
                                 </div>
 
                                 {/* Tooltip */}
-                                <div className="absolute bottom-full left-0 mb-2 w-64 p-2 bg-slate-800 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                <div className="absolute bottom-full left-0 mb-1 w-64 p-2 bg-slate-800 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
                                     Only IT Team can modify user roles.
                                     <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-slate-800"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Notifications */}
-                <div className="p-6 border-b border-slate-200 dark:border-slate-800">
-                    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <Bell size={20} className="text-blue-500" /> Notifications
-                    </h2>
-                    <div className="space-y-3">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" defaultChecked className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
-                            <span className="text-slate-700 dark:text-slate-300">Weekly Skill Gap Reports</span>
-                        </label>
-                        <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" defaultChecked className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
-                            <span className="text-slate-700 dark:text-slate-300">New Course Alerts</span>
-                        </label>
                     </div>
                 </div>
 

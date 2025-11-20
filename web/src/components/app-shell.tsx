@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Settings, User, Search, Lock } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, Settings, LogOut, User, Lock, Building2, BarChart3, Search } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -32,7 +32,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         <LayoutDashboard size={20} />
                         <span className="font-medium">Department Overview</span>
                     </Link>
-                    <Link href="/settings" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${pathname === '/settings' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                    <Link
+                        href="/analytics"
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${pathname === "/analytics"
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 font-medium"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900"
+                            }`}
+                    >
+                        <BarChart3 size={20} />
+                        Analytics
+                    </Link>
+                    <Link
+                        href="/settings"
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${pathname === '/settings' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                         <Settings size={20} />
                         <span className="font-medium">Settings</span>
                     </Link>
