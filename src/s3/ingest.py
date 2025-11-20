@@ -166,8 +166,8 @@ def translate_text(value: Any, force: bool = False) -> str:
     if not force and not looks_like_czech(text):
         translation_cache[text] = text
         return text
-    # If no model and no google translator, just return as-is
-    if (translator_model is None or translator_tokenizer is None) and google_translator is None:
+    # If no translation model available, just return as-is
+    if translator_model is None or translator_tokenizer is None:
         translation_cache[text] = text
         return text
     # Queue for batch translation (will be processed later)
