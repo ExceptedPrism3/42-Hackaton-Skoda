@@ -52,61 +52,87 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
                 <div className="p-4 border-t border-slate-200 dark:border-slate-800">
                     <div className="group relative">
-                        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 cursor-pointer">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-900/40 dark:to-emerald-800/40 flex items-center justify-center text-emerald-700 dark:text-emerald-400 shadow-sm group-hover:shadow-md transition-shadow">
-                                <User size={18} />
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 hover:from-emerald-50 hover:to-emerald-50/50 dark:hover:from-emerald-900/20 dark:hover:to-emerald-900/10 transition-all duration-300 cursor-pointer border border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700/50 shadow-sm hover:shadow-md group-hover:scale-[1.02]">
+                            {/* Avatar with ring */}
+                            <div className="relative">
+                                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 dark:from-emerald-600 dark:via-emerald-700 dark:to-emerald-800 flex items-center justify-center text-white shadow-lg group-hover:shadow-xl group-hover:ring-2 group-hover:ring-emerald-400/50 dark:group-hover:ring-emerald-500/50 transition-all duration-300 group-hover:scale-110">
+                                    <User size={20} className="drop-shadow-sm" />
+                                </div>
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 dark:bg-emerald-400 rounded-full border-2 border-white dark:border-slate-950 shadow-sm"></div>
                             </div>
+                            
+                            {/* User info */}
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">{user?.name || 'User'}</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.role || 'Employee'}</p>
+                                <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                                    {user?.name || 'User'}
+                                </p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 font-medium">
+                                    {user?.role || 'Employee'}
+                                </p>
                             </div>
-                            <div className="text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="transform group-hover:rotate-180 transition-transform duration-200">
-                                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            
+                            {/* Dropdown icon with animation */}
+                            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 transition-all duration-300">
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-slate-500 dark:text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transform group-hover:rotate-180 transition-all duration-300">
+                                    <path d="M3.5 5.25L7 8.75L10.5 5.25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                             </div>
                         </div>
 
-                        {/* Enhanced Popover for Settings and Logout */}
-                        <div className="absolute bottom-full left-0 w-full mb-2 bg-white dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out transform translate-y-2 group-hover:translate-y-0 overflow-hidden backdrop-blur-sm">
-                            {/* Arrow pointer */}
-                            <div className="absolute bottom-0 left-6 transform translate-y-full">
-                                <div className="w-3 h-3 bg-white dark:bg-slate-950 border-r border-b border-slate-200 dark:border-slate-800 transform rotate-45 -mt-1.5"></div>
+                        {/* Premium Popover Design */}
+                        <div className="absolute bottom-full left-0 w-full mb-3 bg-white dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 ease-out transform translate-y-3 group-hover:translate-y-0 overflow-hidden z-50">
+                            {/* Arrow pointer with shadow */}
+                            <div className="absolute bottom-0 left-6 transform translate-y-1/2 rotate-45">
+                                <div className="w-4 h-4 bg-white dark:bg-slate-950 border-r border-b border-slate-200 dark:border-slate-800 shadow-lg"></div>
                             </div>
                             
-                            <div className="relative bg-white dark:bg-slate-950 rounded-xl overflow-hidden">
-                                {/* User info header */}
-                                <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-b border-slate-200 dark:border-slate-800">
-                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Account</p>
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate">{user?.name || 'User'}</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user?.email || user?.role || 'Employee'}</p>
+                            <div className="relative bg-white dark:bg-slate-950 rounded-2xl overflow-hidden">
+                                {/* User info header with gradient */}
+                                <div className="px-5 py-4 bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 border-b border-slate-200 dark:border-slate-800">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 dark:from-emerald-600 dark:to-emerald-700 flex items-center justify-center text-white shadow-lg">
+                                            <User size={20} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{user?.name || 'User'}</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{user?.email || user?.role || 'Employee'}</p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {/* Menu items */}
-                                <div className="py-1">
+                                {/* Menu items with better spacing */}
+                                <div className="py-2">
                                     <Link
                                         href="/settings"
-                                        className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-all duration-150 ${
+                                        className={`w-full text-left px-5 py-3.5 text-sm flex items-center gap-3 transition-all duration-200 group/item ${
                                             pathname === '/settings' 
-                                                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-medium' 
-                                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900'
+                                                ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-semibold border-l-4 border-emerald-500' 
+                                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50 border-l-4 border-transparent'
                                         }`}
                                     >
-                                        <Settings size={18} className="flex-shrink-0" />
-                                        <span>Settings</span>
+                                        <div className={`p-1.5 rounded-lg ${
+                                            pathname === '/settings' 
+                                                ? 'bg-emerald-100 dark:bg-emerald-900/50' 
+                                                : 'bg-slate-100 dark:bg-slate-800 group-hover/item:bg-emerald-50 dark:group-hover/item:bg-emerald-900/20'
+                                        } transition-colors`}>
+                                            <Settings size={16} className={pathname === '/settings' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'} />
+                                        </div>
+                                        <span className="flex-1">Settings</span>
                                         {pathname === '/settings' && (
-                                            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                                         )}
                                     </Link>
                                     
-                                    <div className="my-1 border-t border-slate-200 dark:border-slate-800"></div>
+                                    <div className="my-1 mx-5 border-t border-slate-200 dark:border-slate-800"></div>
                                     
                                     <button
                                         onClick={logout}
-                                        className="w-full text-left px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-all duration-150 group/logout"
+                                        className="w-full text-left px-5 py-3.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-all duration-200 group/logout border-l-4 border-transparent hover:border-red-500"
                                     >
-                                        <LogOut size={18} className="flex-shrink-0 group-hover/logout:rotate-12 transition-transform" />
-                                        <span className="font-medium">Log Out</span>
+                                        <div className="p-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 group-hover/logout:bg-red-100 dark:group-hover/logout:bg-red-900/30 transition-colors">
+                                            <LogOut size={16} className="text-red-600 dark:text-red-400 group-hover/logout:rotate-12 transition-transform duration-200" />
+                                        </div>
+                                        <span className="flex-1 font-semibold">Log Out</span>
                                     </button>
                                 </div>
                             </div>
