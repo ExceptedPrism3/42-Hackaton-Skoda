@@ -1,3 +1,5 @@
+.gitignore
+
 # Sensitive Data
 data/
 web/src/data/
@@ -19,3 +21,7 @@ node_modules/
 .next/
 out/
 build/
+
+# Presentation & Assessment
+presentation.html
+HACKATHON_ASSESSMENT.md
