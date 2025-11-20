@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import random
 from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -51,52 +50,6 @@ if TRANSLATION_CACHE_PATH.exists():
 
 # Batch translation queue
 _translation_queue: List[str] = []
-
-FIRST_NAMES = [
-    "Anna",
-    "Elena",
-    "Nina",
-    "Sofia",
-    "Tereza",
-    "Marek",
-    "Jakub",
-    "Petr",
-    "Filip",
-    "Lucie",
-    "Gabriela",
-    "Matej",
-    "Adela",
-    "Klara",
-    "Barbora",
-    "Daniel",
-    "Ondrej",
-    "Michal",
-    "Ivana",
-    "Simona",
-]
-
-LAST_NAMES = [
-    "Novak",
-    "Svoboda",
-    "Vesely",
-    "Prochazka",
-    "Kucera",
-    "Horak",
-    "Nemec",
-    "Pospisil",
-    "Hajek",
-    "Král",
-    "Dvorak",
-    "Fiala",
-    "Benes",
-    "Sedlacek",
-    "Stepanek",
-    "Ruzicka",
-    "Urban",
-    "Mach",
-    "Blazek",
-    "Holub",
-]
 
 CATEGORY_KEYWORDS = {
     "Leadership & Management": ["leadership", "management", "strategy", "board", "project"],
@@ -157,17 +110,6 @@ def looks_like_czech(text: str) -> bool:
     # Check for Czech-specific chars
     czech_chars = set("áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
     return any(c in czech_chars for c in text)
-
-
-def generate_mock_name(user_id: str) -> str:
-    """Generate a consistent mock name based on user ID."""
-    # Seed random with user_id so the name is always the same for the same ID
-    # We use a simple hash of the ID to seed
-    seed_val = int(user_id) if user_id.isdigit() else hash(user_id)
-    rng = random.Random(seed_val)
-    first = rng.choice(FIRST_NAMES)
-    last = rng.choice(LAST_NAMES)
-    return f"{first} {last}"
 
 
 def infer_department(role: str, position: str) -> str:

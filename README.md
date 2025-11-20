@@ -1,130 +1,219 @@
-# S³ — Skoda Smart Stream
+# S³ — Škoda Smart Stream
 
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python&logoColor=white)
-![Status](https://img.shields.io/badge/Hackathon-Škoda%20AI%20Skill%20Coach-brightgreen)
-![Made at](https://img.shields.io/badge/42-Heilbronn%20×%2042%20Prague-000000?logo=42)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-AI-native skill acceleration for Škoda employees. S³ reframes learning as an on-demand puzzle: the system understands what each person already knows, surfaces the exact missing skills, and delivers ultra-short interventions that translate into productivity gains the same day.
+> **AI-powered Learning & Development Platform for Škoda Auto**
 
-## Team
-- Organization: 42 Heilbronn × 42 Prague
-- Members: `________`, `________`, `________`, `________`, `________`
+S³ is a comprehensive HR and learning management system that helps Škoda Auto identify skill gaps, recommend personalized learning paths, and track employee development. The platform uses real organizational data to provide actionable insights for both employees and HR managers.
 
-## Problem
-- Training libraries are huge, but employees only need ~10 % of each course to unblock their work.
-- Annual exams are outdated: they miss real knowledge gaps that appear in day-to-day tasks.
-- Productivity tools exist (Copilot, templates, macros) but employees rarely discover or adopt them.
+## ✨ Features
 
-## Solution Highlights
-- **Learning as a Puzzle** – Decompose legacy courses into 3–5 minute, AI-tagged chunks so only the missing pieces are assigned.
-- **Dynamic Diagnostics** – Weekly or task-triggered micro-questions verify skills in-context, immediately linking to the right nugget when a gap is detected.
-- **Productivity Booster** – When a skill is already strong, the agent recommends accelerators (templates, copilots, automations) rather than more learning hours.
+### For Employees
+- **Personalized Learning Feed** - Browse 10,000+ micro-learning modules across multiple categories
+- **Skill Gap Visualization** - "Swiss Cheese" profile showing strengths and areas for improvement
+- **Course Recommendations** - AI-powered suggestions based on your role and skill gaps
+- **Progress Tracking** - Monitor your learning journey and completed courses
+- **Search & Filter** - Find relevant courses quickly with advanced search
 
-## Technical Blueprint
-1. **Content Granulation**
-   - Parse source courses/transcripts (see `data/`).
-   - Use the included chunker + tagger to convert raw exports into micro-modules.
-2. **Swiss-Cheese Profiles**
-   - Store user evidence (`verified`, `inferred`, `unknown`) per skill.
-   - Visualize gaps as “holes” that must be filled before the next project milestone.
-3. **Recommendation Engine**
-   - Maintain a vector store of chunk embeddings + metadata.
-   - Retrieve the smallest set of chunks that cover open holes while respecting time constraints.
-4. **Micro-Diagnostics Loop**
-   - Generate micro-scenarios tied to active tasks.
-   - Route answers into the profile (verified vs. needs help) and trigger targeted nudges.
-5. **Delivery Layer**
-   - Playlist view for upcoming micro-modules.
-   - Productivity tips surfaced when confidence is high but better tools exist.
+### For HR Managers
+- **Employee Search** - Find employees with advanced filters (skill gaps, department, etc.)
+- **Analytics Dashboard** - Comprehensive insights into workforce skills and learning trends
+- **Department Overview** - Track skill health across departments
+- **Module Assignment** - Assign courses directly to employees
+- **Learning Analytics** - Track completion rates, popular courses, and top learners
 
-## Architecture Diagram
-```mermaid
-flowchart LR
-    subgraph Data["Data Assets"]
-        D1["TXT Exports"]
-        D2["Excel Sheets"]
-    end
+## 🏗️ Architecture
 
-    subgraph Pipeline["Ingestion Pipeline"]
-        L["Loader"]
-        C["Chunker"]
-        T["Tagger"]
-        E["TF-IDF Embedder"]
-        VS["Vector Store (artifacts/)"]
-    end
+The project consists of two main components:
 
-    subgraph Experience["Experience Layer"]
-        P["Swiss-Cheese Profile"]
-        R["Recommendation Engine"]
-        Q["Micro-Question Generator"]
-        B["Productivity Boosters"]
-        CLI["Typer CLI"]
-    end
+1. **Data Ingestion Pipeline** (`src/s3/`) - Python scripts that process raw Škoda data files
+2. **Web Application** (`web/`) - Next.js frontend with TypeScript
 
-    D1 --> L
-    D2 --> L
-    L --> C --> T --> E --> VS
-    VS --> R
-    P --> R
-    P --> Q
-    P --> B
-    R --> CLI
-    Q --> CLI
-    B --> CLI
-```
-
-## Project Layout
 ```
 .
-├── data/                # Provided hackathon exports (raw, unchanged)
-├── artifacts/           # Auto-generated embeddings/vector store
-├── src/s3/              # Python package with pipeline + demo CLI
-├── pyproject.toml       # Poetry configuration
+├── data/                    # Raw Škoda data files (Excel, TXT)
+├── src/s3/                  # Python data processing pipeline
+│   ├── ingest.py           # Main ingestion script
+│   ├── loader.py           # Data loading utilities
+│   └── ...
+├── web/                     # Next.js web application
+│   ├── src/
+│   │   ├── app/            # Next.js app router pages
+│   │   ├── components/     # React components
+│   │   ├── context/        # React context providers
+│   │   └── data/           # Generated JSON data files
+│   └── ...
+└── artifacts/               # Generated artifacts (translations, vector store)
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** 18+ and npm
+- **Python** 3.11+
+- **Poetry** (for Python dependency management)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/Skoda.git
+   cd Skoda
+   ```
+
+2. **Set up Python environment**
+   ```bash
+   # Install Poetry if you haven't already
+   curl -sSL https://install.python-poetry.org | python3 -
+   
+   # Install Python dependencies
+   poetry install
+   ```
+
+3. **Process the data**
+   ```bash
+   # This will generate users.json, courses.json, and other data files
+   poetry run python -m src.s3.ingest
+   ```
+
+4. **Set up the web application**
+   ```bash
+   cd web
+   npm install
+   ```
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Demo Credentials
+
+For the login page, you can use any username and password - it's a demo system.
+
+## 📊 Data Sources
+
+The platform uses real Škoda Auto data from multiple sources:
+
+- **ERP Data** (`ERP_SK1.Start_month - SE.xlsx`) - Employee profiles, roles, education
+- **Training History** (`ZHRPD_VZD_STA_007.xlsx`, `ZHRPD_VZD_STA_016_RE_RHRHAZ00.xlsx`) - Course completions
+- **Degreed Platform** (`Degreed.xlsx`) - External learning platform data
+- **Skill Mapping** (`Skill_mapping.xlsx`) - Course-to-skill mappings
+- **Organizational Hierarchy** (`RLS.sa_org_hierarchy - SE.xlsx`) - Department structure
+- **Course Descriptions** (TXT files) - Multi-language course content
+- **Job Descriptions** (RE_RHRHAZ00 files) - Role-specific responsibilities
+
+## 🎯 Key Pages
+
+- **`/`** - Employee search with filters
+- **`/employee/[id]`** - Individual employee profile with skills and recommendations
+- **`/feed`** - Daily micro-challenges and course catalog
+- **`/analytics`** - Comprehensive analytics dashboard
+- **`/department`** - Department overview and skill health
+- **`/documentation`** - Platform documentation and help
+- **`/settings`** - User settings
+
+## 🛠️ Technology Stack
+
+### Frontend
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **Recharts** - Data visualization
+- **Lucide React** - Icon library
+
+### Backend/Data Processing
+- **Python 3.11+** - Data processing
+- **Pandas** - Data manipulation
+- **Transformers** - Czech-to-English translation
+- **scikit-learn** - Vector embeddings and similarity
+
+## 📁 Project Structure
+
+```
+Skoda/
+├── data/                          # Raw data files (Excel, TXT, PDF)
+├── src/s3/                        # Python data processing
+│   ├── ingest.py                 # Main ingestion script
+│   ├── loader.py                 # File loading utilities
+│   ├── chunker.py                # Text chunking
+│   ├── tagger.py                 # Content tagging
+│   ├── embedder.py               # Text embeddings
+│   ├── vector_store.py           # Vector storage
+│   └── ...
+├── web/                           # Next.js application
+│   ├── src/
+│   │   ├── app/                  # Pages (App Router)
+│   │   │   ├── page.tsx         # Employee search
+│   │   │   ├── employee/[id]/   # Employee detail
+│   │   │   ├── feed/            # Learning feed
+│   │   │   ├── analytics/       # Analytics dashboard
+│   │   │   └── ...
+│   │   ├── components/          # React components
+│   │   ├── context/             # Context providers
+│   │   └── data/                # Generated JSON data
+│   ├── package.json
+│   └── ...
+├── artifacts/                     # Generated artifacts
+│   ├── translation_cache.json   # Translation cache
+│   └── vector_store/            # Vector embeddings
 └── README.md
 ```
 
-## Running the Prototype
+## 🔄 Data Processing Workflow
 
-1. **Install dependencies**
-   ```bash
-   cd /Users/pixo/Documents/Coding/Skoda
-   poetry install
-   ```
-2. **Ingest the dataset**
-   ```bash
-   poetry run python -m s3.cli run-ingest
-   ```
-   This reads `data/`, builds micro-chunks with tags, and stores embeddings under `artifacts/vector_store/`.
-3. **Demo the experience**
-   ```bash
-   poetry run python -m s3.cli demo anna
-   ```
-   The CLI prints recommended chunks (puzzle pieces), micro-questions (dynamic diagnostics), and productivity boosters for a sample persona.
+1. **Load Raw Data** - Read Excel and text files from `data/` directory
+2. **Translate** - Convert Czech text to English using translation models
+3. **Process** - Extract courses, users, skills, and relationships
+4. **Enrich** - Add job descriptions, course descriptions, and metadata
+5. **Export** - Generate JSON files for the web application
 
-## Dataset Notes
-- Raw hackathon exports live in `data/`.
-- Keep original filenames for traceability; derived/cleaned artifacts should go under `data/processed/` (to be created).
-- Recommended first steps:
-  - Inspect structure (`.txt`, `.xlsx`, `.pdf`).
-  - Draft a schema for skills, tags, and user signals.
-  - Build a data dictionary to map source columns to the unified profile.
+Run the ingestion script whenever you update the source data:
+```bash
+poetry run python -m src.s3.ingest
+```
 
-## Hackathon Plan of Attack
-1. **Day 1** – Data audit, schema design, quick-and-dirty chunking script, placeholder embeddings.
-2. **Day 2** – Mock user profiles, retrieval scoring, micro-question generator, basic UI storyboard.
-3. **Final Stretch** – Polish pitch: show “Anna” scenario, Swiss-cheese visualization, and productivity booster demo.
+## 🎨 Design Features
 
-## Pitch Soundbites
-- “We cut training waste by removing what people already know.”
-- “Micro-questions keep diagnostics alive and painless.”
-- “From Just-in-Case learning to Just-in-Time performance.”
+- **Dark Mode Support** - Full dark/light theme support
+- **Responsive Design** - Works on desktop, tablet, and mobile
+- **Smooth Animations** - Polished UI with smooth transitions
+- **Accessibility** - WCAG-compliant design patterns
 
-## Next Steps
-- Connect the heuristic tagger to a hosted LLM for richer skill metadata.
-- Replace TF-IDF with sentence transformers to improve retrieval precision.
-- Add a Streamlit or web UI that mirrors the CLI scenario for judges.
+## 📈 Analytics Features
 
-## License
-Released under the terms described in `LICENSE`.
+- Department distribution and skill health
+- Top skills and proficiency levels
+- Learning activity trends
+- Course completion rates
+- Top learners leaderboard
+- Popular courses analysis
 
+## 🔐 Authentication
+
+The platform uses a simple demo authentication system. In production, this would integrate with Škoda's SSO system.
+
+## 📝 License
+
+This project is released under the MIT License. See `LICENSE` file for details.
+
+## 🤝 Contributing
+
+This is a hackathon project for Škoda Auto. For questions or contributions, please open an issue or contact the team.
+
+## 🙏 Acknowledgments
+
+- **Škoda Auto** - For providing the dataset and hackathon opportunity
+- **42 Heilbronn × 42 Prague** - Hackathon organization
+- Built with ❤️ for better employee learning experiences
+
+---
+
+**Note**: This is a prototype/demo system. For production use, additional security, performance optimizations, and integrations would be required.
