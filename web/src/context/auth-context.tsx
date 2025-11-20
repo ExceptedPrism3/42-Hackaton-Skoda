@@ -25,6 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     useEffect(() => {
         if (typeof window === "undefined") {
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [startTransition]);
 
     const login = (username: string) => {
+        setIsLoggingOut(false);
         setIsLoading(true);
         // Simulate network delay for transition
         setTimeout(() => {
@@ -47,18 +49,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             };
             setUser(mockUser);
             localStorage.setItem("s3_user", JSON.stringify(mockUser));
+            setIsLoading(false);
             router.push("/");
-            setTimeout(() => setIsLoading(false), 500); // Keep loading slightly after push
         }, 1500);
     };
 
     const logout = () => {
+        setIsLoggingOut(true);
         setIsLoading(true);
         setTimeout(() => {
             setUser(null);
             localStorage.removeItem("s3_user");
-            router.push("/login");
             setIsLoading(false);
+            setIsLoggingOut(false);
+            router.push("/login");
         }, 1000);
     };
 
@@ -77,11 +81,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return (
         <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
             {isLoading && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm transition-all">
-                    <div className="flex flex-col items-center gap-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/90 dark:bg-slate-950/90 backdrop-blur-md transition-all duration-300 ease-out">
+                    <div className="flex flex-col items-center gap-4 p-8 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transform transition-all duration-300 animate-scale-in">
                         <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-emerald-600 dark:text-emerald-400 font-medium animate-pulse">
-                            {user ? "Signing out..." : "Authenticating..."}
+                        <p className="text-emerald-600 dark:text-emerald-400 font-medium text-sm animate-pulse">
+                            {isLoggingOut ? "Signing out..." : "Signing in..."}
                         </p>
                     </div>
                 </div>

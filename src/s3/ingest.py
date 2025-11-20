@@ -25,6 +25,8 @@ BATCH_MODEL_NAME = "Helsinki-NLP/opus-mt-cs-en"
 DATA_DIR = Path("data")
 OUTPUT_USERS = Path("web/src/data/users.json")
 OUTPUT_COURSES = Path("web/src/data/courses.json")
+OUTPUT_JOB_DESCRIPTIONS = Path("web/src/data/job_descriptions.json")
+OUTPUT_COURSE_CONTENT = Path("web/src/data/course_content.json")
 TRANSLATION_CACHE_PATH = Path("artifacts/translation_cache.json")
 TODAY = datetime(2025, 8, 28)
 
@@ -296,6 +298,35 @@ def summarize_categories(course_titles: Iterable[str]) -> List[Dict[str, Any]]:
     ]
 
 
+def load_org_hierarchy() -> Dict[str, str]:
+    """Load organizational hierarchy to map user IDs to real departments."""
+    hierarchy: Dict[str, str] = {}
+    try:
+        df = pd.read_excel(DATA_DIR / "RLS.sa_org_hierarchy - SE.xlsx")
+        # Try to find columns that might contain user ID and department
+        # Common column names might be: personal_number, user_id, department, org_unit, etc.
+        id_col = None
+        dept_col = None
+        
+        for col in df.columns:
+            col_lower = str(col).lower()
+            if any(x in col_lower for x in ["personal", "user", "id", "employee"]):
+                id_col = col
+            if any(x in col_lower for x in ["department", "org", "unit", "division", "oddělení"]):
+                dept_col = col
+        
+        if id_col and dept_col:
+            for row in df.to_dict("records"):
+                user_id = str(row.get(id_col, "")).strip()
+                dept = translate_text(row.get(dept_col, ""))
+                if user_id and user_id != "nan" and dept:
+                    hierarchy[user_id] = dept
+        logger.info("Loaded %d organizational hierarchy entries", len(hierarchy))
+    except Exception as exc:
+        logger.warning("Failed to load org hierarchy: %s", exc)
+    return hierarchy
+
+
 def load_erp_profiles() -> Dict[str, Dict[str, Any]]:
     df = pd.read_excel(DATA_DIR / "ERP_SK1.Start_month - SE.xlsx")
     df = df.rename(
@@ -381,10 +412,85 @@ def load_degreed_history() -> Dict[str, Dict[str, Any]]:
     return latest
 
 
+def load_course_descriptions() -> Dict[str, Dict[str, str]]:
+    """Load course descriptions from text export files in multiple languages."""
+    descriptions: Dict[str, Dict[str, str]] = {}  # {course_id: {lang: description}}
+    try:
+        # Load descriptions in all languages
+        lang_files = {
+            "en": "250828_Export_AI_Skill_Coatch_ZHRPD_DESCR_EXPORT_EN.txt",
+            "cs": "250828_Export_AI_Skill_Coatch_ZHRPD_DESCR_EXPORT_CS.txt",
+            "de": "250828_Export_AI_Skill_Coatch_ZHRPD_DESCR_EXPORT_DE.txt",
+        }
+        
+        for lang, filename in lang_files.items():
+            desc_file = DATA_DIR / filename
+            if desc_file.exists():
+                content = desc_file.read_text(encoding="utf-8", errors="ignore")
+                for line in content.split("\n"):
+                    if "\t" in line and not line.strip().startswith("Var.plánu"):
+                        parts = line.split("\t")
+                        if len(parts) >= 8:
+                            course_id = parts[2].strip() if len(parts) > 2 else None
+                            description = parts[-1].strip() if parts else None
+                            if course_id and description and description != "nan" and course_id.isdigit():
+                                if course_id not in descriptions:
+                                    descriptions[course_id] = {}
+                                descriptions[course_id][lang] = description if lang == "en" else translate_text(description)
+        logger.info("Loaded %d course descriptions in multiple languages", len(descriptions))
+    except Exception as exc:
+        logger.warning("Failed to load course descriptions: %s", exc)
+    return descriptions
+
+
+def load_job_descriptions() -> Dict[str, Dict[str, str]]:
+    """Load job descriptions from RE_RHRHAZ00 text files."""
+    job_descriptions: Dict[str, Dict[str, str]] = {}  # {object_id: {lang: description}}
+    try:
+        # These files contain job descriptions/tasks in multiple languages
+        job_files = [
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_ZP.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_ZS.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_ZX.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_P_S.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_S_T.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_T_ZP.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_T_ZS.txt",
+            "250828_Export_AI_Skill_Coatch_RE_RHRHAZ00_T_ZX.txt",
+        ]
+        
+        for filename in job_files:
+            job_file = DATA_DIR / filename
+            if job_file.exists():
+                content = job_file.read_text(encoding="utf-8", errors="ignore")
+                for line in content.split("\n"):
+                    if "\t" in line and not any(line.strip().startswith(x) for x in ["VP", "Zobrazen", "28.08"]):
+                        parts = line.split("\t")
+                        if len(parts) >= 10:
+                            object_id = parts[2].strip() if len(parts) > 2 else None
+                            lang_code = parts[7].strip() if len(parts) > 7 else None
+                            description = parts[-1].strip() if parts else None
+                            
+                            if object_id and description and description != "nan" and object_id.isdigit():
+                                lang_map = {"C": "cs", "D": "de", "E": "en"}
+                                lang = lang_map.get(lang_code, "en")
+                                
+                                if object_id not in job_descriptions:
+                                    job_descriptions[object_id] = {}
+                                # Translate if not English
+                                job_descriptions[object_id][lang] = description if lang == "en" else translate_text(description)
+        logger.info("Loaded %d job descriptions", len(job_descriptions))
+    except Exception as exc:
+        logger.warning("Failed to load job descriptions: %s", exc)
+    return job_descriptions
+
+
 def build_course_catalog() -> List[Dict[str, Any]]:
     seen = set()
     catalog: List[Dict[str, Any]] = []
     max_courses = 10000 # Increased limit for full dataset
+    course_descriptions = load_course_descriptions()
+    job_descriptions = load_job_descriptions()
 
     def add_entry(title: Any, source: str, metadata: Dict[str, Any] | None = None) -> None:
         clean_title = translate_text(title)
@@ -407,6 +513,28 @@ def build_course_catalog() -> List[Dict[str, Any]]:
                     entry[key] = value
         if not entry.get("category"):
             entry["category"] = infer_category(clean_title)
+        
+        # Try to find matching description by title or ID
+        # Search for description that contains the course title
+        for desc_id, desc_dict in course_descriptions.items():
+            # Check if any description text matches
+            for lang, desc_text in desc_dict.items():
+                if clean_title.lower() in desc_text.lower() or desc_text.lower() in clean_title.lower():
+                    entry["description"] = desc_dict.get("en", desc_text)
+                    entry["descriptions"] = desc_dict  # Store all languages
+                    break
+            if "description" in entry:
+                break
+        
+        # Also try to match with job descriptions
+        for job_id, job_dict in job_descriptions.items():
+            for lang, job_text in job_dict.items():
+                if clean_title.lower() in job_text.lower() or job_text.lower() in clean_title.lower():
+                    if "description" not in entry:
+                        entry["description"] = job_dict.get("en", job_text)
+                        entry["job_description"] = job_dict.get("en", job_text)
+                    break
+        
         catalog.append(entry)
 
     skill_df = pd.read_excel(DATA_DIR / "Skill_mapping.xlsx")
@@ -425,15 +553,18 @@ def build_course_catalog() -> List[Dict[str, Any]]:
         )
 
     training_titles = pd.read_excel(DATA_DIR / "ZHRPD_VZD_STA_007.xlsx")["Označení typu akce"].dropna().unique()
-    # LIMIT FOR DEMO
-    for title in training_titles[:50]:
+    # Use ALL training titles from Legacy LMS
+    for title in training_titles:
         add_entry(title, "Legacy LMS")
 
     degreed_df = pd.read_excel(DATA_DIR / "Degreed.xlsx")
-    # LIMIT FOR DEMO
-    for _, row in degreed_df.head(50).iterrows():
+    # Use ALL Degreed courses
+    for _, row in degreed_df.iterrows():
+        title = row.get("Content Title")
+        if pd.isna(title) or not title:
+            continue
         add_entry(
-            row.get("Content Title"),
+            title,
             "Degreed",
             {"provider": row.get("Content Provider"), "content_type": row.get("Content Type")},
         )
@@ -463,6 +594,8 @@ def merge_histories(*histories: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Li
 
 def build_user_profiles() -> List[Dict[str, Any]]:
     erp = load_erp_profiles()
+    org_hierarchy = load_org_hierarchy()
+    job_descriptions = load_job_descriptions()
     history007 = load_training_history()
     history016 = load_extended_history()
     degreed = load_degreed_history()
@@ -505,11 +638,18 @@ def build_user_profiles() -> List[Dict[str, Any]]:
         else:
             current_focus = "Awaiting next assignment"
 
+        # Use real department from org hierarchy if available, otherwise infer
+        real_department = org_hierarchy.get(user_id)
+        department = real_department if real_department else infer_department(profile["profession"], profile["planned_position"])
+
+        # Use Employee ID format
+        display_name = f"Employee {user_id}"
+
         users.append(
             {
                 "id": user_id,
-                "name": f"Employee {user_id}", # Reverted to ID as requested
-                "department": infer_department(profile["profession"], profile["planned_position"]),
+                "name": display_name,
+                "department": department,
                 "role": profile["profession"],
                 "position": profile["planned_position"],
                 "experience_years": experience_years,
@@ -532,8 +672,19 @@ def build_user_profiles() -> List[Dict[str, Any]]:
                     for entry in recent_entries
                 ],
                 "course_mix": course_mix,
+                "job_descriptions": [],  # Will be populated below
             }
         )
+        
+        # Try to find job descriptions related to this user's position/role
+        user_job_descs = []
+        position_lower = (profile.get("planned_position", "") + " " + profile.get("profession", "")).lower()
+        for job_id, job_dict in job_descriptions.items():
+            job_text = job_dict.get("en", "")
+            if job_text and any(word in job_text.lower() for word in position_lower.split() if len(word) > 3):
+                user_job_descs.append(job_dict.get("en", ""))
+        if user_job_descs:
+            users[-1]["job_descriptions"] = user_job_descs[:5]  # Limit to 5 most relevant
     return users
 
 
@@ -570,6 +721,41 @@ def main() -> None:
     with open(OUTPUT_USERS, "w", encoding="utf-8") as fp:
         json.dump(users, fp, indent=2, ensure_ascii=False)
     logger.info("Saved %d users to %s", len(users), OUTPUT_USERS)
+
+    # Export job descriptions
+    logger.info("Exporting job descriptions...")
+    job_descriptions = load_job_descriptions()
+    OUTPUT_JOB_DESCRIPTIONS.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUTPUT_JOB_DESCRIPTIONS, "w", encoding="utf-8") as fp:
+        json.dump(job_descriptions, fp, indent=2, ensure_ascii=False)
+    logger.info("Saved %d job descriptions to %s", len(job_descriptions), OUTPUT_JOB_DESCRIPTIONS)
+
+    # Export course content from vector store if available
+    logger.info("Exporting course content...")
+    try:
+        from .vector_store import VectorStore
+        from .config import settings
+        store = VectorStore()
+        store.load()
+        course_content = [
+            {
+                "id": chunk.id,
+                "source_path": chunk.source_path,
+                "text": chunk.text,
+                "tags": chunk.tags,
+            }
+            for chunk in store.chunks[:1000]  # Limit to first 1000 chunks for web
+        ]
+        OUTPUT_COURSE_CONTENT.parent.mkdir(parents=True, exist_ok=True)
+        with open(OUTPUT_COURSE_CONTENT, "w", encoding="utf-8") as fp:
+            json.dump(course_content, fp, indent=2, ensure_ascii=False)
+        logger.info("Saved %d course content chunks to %s", len(course_content), OUTPUT_COURSE_CONTENT)
+    except Exception as exc:
+        logger.warning("Could not load vector store for course content: %s", exc)
+        # Create empty file
+        OUTPUT_COURSE_CONTENT.parent.mkdir(parents=True, exist_ok=True)
+        with open(OUTPUT_COURSE_CONTENT, "w", encoding="utf-8") as fp:
+            json.dump([], fp, indent=2, ensure_ascii=False)
 
     if translation_cache:
         TRANSLATION_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
