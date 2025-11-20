@@ -22,14 +22,37 @@ fi
 # Step 1: Install system dependencies
 echo -e "\n${YELLOW}Step 1: Installing system dependencies...${NC}"
 sudo apt update
-sudo apt install -y nodejs npm python3 python3-pip python3-venv git
 
-# Install Node.js 18+ if not already installed
-if ! command -v node &> /dev/null || [ "$(node -v | cut -d'v' -f2 | cut -d'.' -f1)" -lt 18 ]; then
+# Check Node.js version
+NODE_VERSION=0
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
+    echo "Node.js $(node -v) is already installed"
+fi
+
+# Install Node.js 18+ if not already installed or if version is too old
+if [ "$NODE_VERSION" -lt 18 ]; then
     echo "Installing Node.js 18..."
+    # Remove conflicting npm package if it exists
+    sudo apt remove -y npm 2>/dev/null || true
     curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
     sudo apt install -y nodejs
+    # Verify npm is available (comes bundled with nodejs from NodeSource)
+    if ! command -v npm &> /dev/null; then
+        echo "⚠️  npm not found, installing separately..."
+        sudo apt install -y npm
+    fi
+else
+    echo "Node.js version is sufficient (18+)"
+    # Ensure npm is available
+    if ! command -v npm &> /dev/null; then
+        echo "Installing npm..."
+        sudo apt install -y npm
+    fi
 fi
+
+# Install other dependencies
+sudo apt install -y python3 python3-pip python3-venv git
 
 # Install PM2 globally
 if ! command -v pm2 &> /dev/null; then
