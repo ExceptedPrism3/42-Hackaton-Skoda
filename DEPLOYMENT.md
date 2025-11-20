@@ -56,7 +56,11 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Install Python dependencies
-pip install pandas transformers scikit-learn
+pip install pandas transformers scikit-learn numpy scipy openpyxl sentencepiece
+
+# Note: torch is optional but recommended for better translation performance
+# Uncomment if you want to install PyTorch (large download ~2GB)
+# pip install torch
 
 # Run data ingestion (make sure data files are in the data/ folder)
 # Add src to PYTHONPATH so Python can find the s3 module

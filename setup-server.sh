@@ -88,7 +88,14 @@ if [ ! -d "venv" ]; then
 fi
 source venv/bin/activate
 pip install --upgrade pip
-pip install pandas transformers scikit-learn
+
+# Install all required Python dependencies
+echo "Installing Python dependencies..."
+pip install pandas transformers scikit-learn numpy scipy openpyxl sentencepiece
+
+# Note: torch is optional but recommended for better translation performance
+# Uncomment the line below if you want to install PyTorch (large download ~2GB)
+# pip install torch
 
 # Step 4: Process data (if data folder exists)
 if [ -d "data" ] && [ "$(ls -A data 2>/dev/null)" ]; then
