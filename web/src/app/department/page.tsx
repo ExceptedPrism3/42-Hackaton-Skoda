@@ -15,10 +15,25 @@ export default function DepartmentOverviewPage() {
         const dept = departments[user.department];
         dept.count++;
 
-        // Simulate gaps based on role/skills
-        // In a real app, this would be calculated from the Swiss Cheese profile
-        const hasGap = !user.skills.excel || user.skills.excel !== "advanced";
-        if (hasGap) dept.gaps++;
+        // Calculate health based on average skill level
+        // Beginner = 1, Intermediate = 2, Advanced = 3
+        // Max score = 3 * number of skills
+        const skillLevels: Record<string, number> = { "beginner": 1, "intermediate": 2, "advanced": 3 };
+        let totalScore = 0;
+        let maxPossibleScore = 0;
+
+        Object.values(user.skills).forEach((level: any) => {
+            totalScore += skillLevels[level.toLowerCase()] || 0;
+            maxPossibleScore += 3;
+        });
+
+        // If average score is below 2 (Intermediate), consider it a "gap"
+        const health = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) : 0;
+        if (health < 0.66) dept.gaps++; // Less than 66% health is a gap
+
+        // Store cumulative health for averaging later
+        if (!dept.skills.health) dept.skills.health = 0;
+        dept.skills.health += health;
     });
 
     return (
@@ -42,12 +57,14 @@ export default function DepartmentOverviewPage() {
                         <div className="space-y-3">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-slate-500">Skill Health</span>
-                                <span className="font-medium text-emerald-600">{Math.round(((data.count - data.gaps) / data.count) * 100)}%</span>
+                                <span className="font-medium text-emerald-600">
+                                    {Math.round((data.skills.health / data.count) * 100)}%
+                                </span>
                             </div>
                             <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                                 <div
                                     className="bg-emerald-500 h-full rounded-full"
-                                    style={{ width: `${((data.count - data.gaps) / data.count) * 100}%` }}
+                                    style={{ width: `${(data.skills.health / data.count) * 100}%` }}
                                 ></div>
                             </div>
 
