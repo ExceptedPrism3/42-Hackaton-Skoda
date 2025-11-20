@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import Link from "next/link";
 import { Search, User, ChevronRight, Filter, X, AlertTriangle } from "lucide-react";
 import usersData from "@/data/users.json";
@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 
 type FilterType = "all" | "has-gaps" | "no-gaps";
 
-export default function HRSearchPage() {
+function HRSearchPageContent() {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("q") || "";
   const [searchTerm, setSearchTerm] = useState(initialSearch);
@@ -233,5 +233,17 @@ export default function HRSearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function HRSearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-slate-500 dark:text-slate-400">Loading...</div>
+      </div>
+    }>
+      <HRSearchPageContent />
+    </Suspense>
   );
 }
