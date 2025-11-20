@@ -30,12 +30,12 @@ if command -v node &> /dev/null; then
     echo "Node.js $(node -v) is already installed"
 fi
 
-# Install Node.js 18+ if not already installed or if version is too old
-if [ "$NODE_VERSION" -lt 18 ]; then
-    echo "Installing Node.js 18..."
+# Install Node.js 20+ if not already installed or if version is too old
+if [ "$NODE_VERSION" -lt 20 ]; then
+    echo "Installing Node.js 20 (required for Next.js 16)..."
     # Remove conflicting npm package if it exists
     sudo apt remove -y npm 2>/dev/null || true
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
     sudo apt install -y nodejs
     # Verify npm is available (comes bundled with nodejs from NodeSource)
     if ! command -v npm &> /dev/null; then
@@ -93,12 +93,15 @@ pip install pandas transformers scikit-learn
 # Step 4: Process data (if data folder exists)
 if [ -d "data" ] && [ "$(ls -A data 2>/dev/null)" ]; then
     echo -e "\n${YELLOW}Step 4: Processing data...${NC}"
+    # Add src to PYTHONPATH so Python can find the s3 module
+    export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
     python -m s3.ingest
     echo -e "${GREEN}✓ Data processed successfully${NC}"
 else
     echo -e "\n${YELLOW}Step 4: Skipping data processing (data folder not found or empty)${NC}"
     echo "⚠️  Make sure to place your data files in the data/ folder and run:"
     echo "   source venv/bin/activate"
+    echo "   export PYTHONPATH=\${PYTHONPATH}:\$(pwd)/src"
     echo "   python -m s3.ingest"
 fi
 

@@ -59,6 +59,8 @@ source venv/bin/activate
 pip install pandas transformers scikit-learn
 
 # Run data ingestion (make sure data files are in the data/ folder)
+# Add src to PYTHONPATH so Python can find the s3 module
+export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
 python -m s3.ingest
 
 # This will generate:
