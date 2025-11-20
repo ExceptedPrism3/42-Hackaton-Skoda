@@ -7,6 +7,7 @@ import usersData from "@/data/users.json";
 
 export default function HRSearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [displayCount, setDisplayCount] = useState(50);
 
   const filteredUsers = useMemo(() => {
     return usersData.filter(user =>
@@ -14,6 +15,12 @@ export default function HRSearchPage() {
       user.id.includes(searchTerm)
     );
   }, [searchTerm]);
+
+  const visibleUsers = filteredUsers.slice(0, displayCount);
+
+  const handleLoadMore = () => {
+    setDisplayCount(prev => prev + 50);
+  };
 
   return (
     <div className="space-y-6">
@@ -28,13 +35,16 @@ export default function HRSearchPage() {
             placeholder="Search by Name or Employee ID..."
             className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setDisplayCount(50); // Reset pagination on search
+            }}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredUsers.slice(0, 50).map((user) => (
+        {visibleUsers.map((user) => (
           <Link key={user.id} href={`/employee/${user.id}`}>
             <div className="bg-white dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-all hover:shadow-md group cursor-pointer flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -52,6 +62,17 @@ export default function HRSearchPage() {
           </Link>
         ))}
       </div>
+
+      {visibleUsers.length < filteredUsers.length && (
+        <div className="flex justify-center pt-8">
+          <button
+            onClick={handleLoadMore}
+            className="px-6 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+          >
+            Load More Employees ({filteredUsers.length - visibleUsers.length} remaining)
+          </button>
+        </div>
+      )}
 
       {filteredUsers.length === 0 && (
         <div className="text-center py-12 text-slate-500">

@@ -384,7 +384,7 @@ def load_degreed_history() -> Dict[str, Dict[str, Any]]:
 def build_course_catalog() -> List[Dict[str, Any]]:
     seen = set()
     catalog: List[Dict[str, Any]] = []
-    max_courses = 600
+    max_courses = 10000 # Increased limit for full dataset
 
     def add_entry(title: Any, source: str, metadata: Dict[str, Any] | None = None) -> None:
         clean_title = translate_text(title)
@@ -480,8 +480,8 @@ def build_user_profiles() -> List[Dict[str, Any]]:
     merged_history = merge_histories(history007, history016)
 
     users = []
-    # LIMIT FOR DEMO: Process only first 50 users to speed up translation
-    erp_items = list(erp.items())[:50]
+    # Process all users
+    erp_items = list(erp.items())
     for user_id, profile in erp_items:
         courses = merged_history.get(user_id, [])
         course_titles = [c["title"] for c in courses if c.get("title")]
