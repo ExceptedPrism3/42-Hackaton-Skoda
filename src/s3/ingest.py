@@ -206,11 +206,6 @@ def flush_translation_queue() -> None:
     logger.info("Batch translation complete")
 
 
-def alias_name(user_id: str) -> str:
-    random.seed(int(user_id))
-    return f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}"
-
-
 def infer_category(title: str) -> str:
     lower = title.lower()
     for category, keywords in CATEGORY_KEYWORDS.items():
