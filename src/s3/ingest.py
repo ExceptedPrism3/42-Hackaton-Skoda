@@ -149,11 +149,23 @@ COMMON_TRANSLATIONS = {
 }
 
 def looks_like_czech(text: str) -> bool:
-    """Quick heuristic: Czech has specific characters like ě, š, č, ř, ž, ý, á, í, é, ó, ú, ů"""
-    czech_chars = "ěščřžýáíéóúůňťď"
-    return any(char in text.lower() for char in czech_chars) or any(
-        word in text.lower() for word in ["vzdělání", "specializace", "učitel", "pracovník", "vysokoškolské"]
-    )
+    """Simple heuristic to check if text is likely Czech."""
+    if not text:
+        return False
+    # Check for Czech-specific chars
+    czech_chars = set("áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ")
+    return any(c in czech_chars for c in text)
+
+
+def generate_mock_name(user_id: str) -> str:
+    """Generate a consistent mock name based on user ID."""
+    # Seed random with user_id so the name is always the same for the same ID
+    # We use a simple hash of the ID to seed
+    seed_val = int(user_id) if user_id.isdigit() else hash(user_id)
+    rng = random.Random(seed_val)
+    first = rng.choice(FIRST_NAMES)
+    last = rng.choice(LAST_NAMES)
+    return f"{first} {last}"
 
 
 def translate_batch(texts: List[str]) -> List[str]:
@@ -285,7 +297,7 @@ def load_erp_profiles() -> Dict[str, Dict[str, Any]]:
             "education_branch": translate_text(row.get("education_branch") or "Applied Sciences"),
             "field_of_study": translate_text(row.get("field_of_study") or "Industrial Engineering"),
             "education_category": translate_text(row.get("education_category") or "University"),
-            "user_name": safe_text(row.get("user_name"), f"Employee {personal_number}"),
+            "user_name": safe_text(row.get("user_name"), None),
         }
     return profiles
 
@@ -474,7 +486,7 @@ def build_user_profiles() -> List[Dict[str, Any]]:
         users.append(
             {
                 "id": user_id,
-                "name": profile.get("user_name") or f"Employee {user_id}",
+                "name": profile.get("user_name") or generate_mock_name(user_id),
                 "department": "Skoda Academy" if "Academy" in profile["planned_position"] else "Operational Excellence",
                 "role": profile["profession"],
                 "position": profile["planned_position"],
