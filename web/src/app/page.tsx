@@ -25,10 +25,10 @@ function HRSearchPageContent() {
 
   // Define expected skill levels by role (Shared logic)
   const ROLE_EXPECTATIONS: Record<string, Record<string, string>> = {
-    "Senior": { "Compliance": "advanced", "Data Storytelling": "intermediate", "Automation": "intermediate" },
-    "Junior": { "Compliance": "intermediate", "Data Storytelling": "beginner", "Automation": "beginner" },
-    "Manager": { "Compliance": "advanced", "Data Storytelling": "advanced", "People Operations": "advanced" },
-    "Specialist": { "Compliance": "intermediate", "Data Storytelling": "intermediate", "Automation": "advanced" }
+    "Senior": { "Compliance Mindset": "advanced", "Storytelling with Slides": "intermediate", "Excel Automation": "intermediate", "Project Delivery": "advanced" },
+    "Junior": { "Compliance Mindset": "intermediate", "Storytelling with Slides": "beginner", "Excel Automation": "beginner" },
+    "Manager": { "Compliance Mindset": "advanced", "Storytelling with Slides": "advanced", "People Operations": "advanced", "Project Delivery": "advanced" },
+    "Specialist": { "Compliance Mindset": "intermediate", "Storytelling with Slides": "intermediate", "Excel Automation": "advanced", "SAP Operations": "intermediate" }
   };
 
   // Helper to check if level is sufficient
@@ -127,8 +127,8 @@ function HRSearchPageContent() {
             <button
               onClick={() => setFilter("all")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === "all"
-                  ? "bg-emerald-600 text-white shadow-md"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                ? "bg-emerald-600 text-white shadow-md"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                 }`}
             >
               All Employees
@@ -136,8 +136,8 @@ function HRSearchPageContent() {
             <button
               onClick={() => setFilter("has-gaps")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${filter === "has-gaps"
-                  ? "bg-amber-600 text-white shadow-md"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                ? "bg-amber-600 text-white shadow-md"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                 }`}
             >
               <AlertTriangle size={16} />
@@ -146,8 +146,8 @@ function HRSearchPageContent() {
             <button
               onClick={() => setFilter("no-gaps")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === "no-gaps"
-                  ? "bg-emerald-600 text-white shadow-md"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                ? "bg-emerald-600 text-white shadow-md"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                 }`}
             >
               No Gaps
@@ -200,13 +200,13 @@ function HRSearchPageContent() {
           return (
             <Link key={user.id} href={`/employee/${user.id}`}>
               <div className={`bg-white dark:bg-slate-950 p-4 rounded-xl border transition-all hover:shadow-md group cursor-pointer flex items-center justify-between ${hasGaps
-                  ? 'border-amber-200 dark:border-amber-800/50 hover:border-amber-400 dark:hover:border-amber-700'
-                  : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500'
+                ? 'border-amber-200 dark:border-amber-800/50 hover:border-amber-400 dark:hover:border-amber-700'
+                : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500'
                 }`}>
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${hasGaps
-                      ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200'
-                      : 'bg-slate-100 dark:bg-slate-900 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-600'
+                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 group-hover:bg-amber-200'
+                    : 'bg-slate-100 dark:bg-slate-900 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-600'
                     }`}>
                     <User size={20} />
                   </div>
@@ -225,8 +225,8 @@ function HRSearchPageContent() {
                   </div>
                 </div>
                 <ChevronRight size={16} className={`flex-shrink-0 transition-colors ${hasGaps
-                    ? 'text-amber-300 group-hover:text-amber-500'
-                    : 'text-slate-300 group-hover:text-emerald-500'
+                  ? 'text-amber-300 group-hover:text-amber-500'
+                  : 'text-slate-300 group-hover:text-emerald-500'
                   }`} />
               </div>
             </Link>
