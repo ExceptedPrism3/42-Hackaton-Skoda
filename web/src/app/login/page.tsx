@@ -4,18 +4,30 @@ import { useState } from "react";
 import { useAuth } from "@/context/auth-context";
 import { Lock, User, ArrowRight, HelpCircle } from "lucide-react";
 
+const VALID_USERNAME = "Maria";
+const VALID_PASSWORD = "Any";
+
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState("");
     const { login } = useAuth();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (username && password && !isSubmitting) {
-            setIsSubmitting(true);
-            login(username);
+        if (!username || !password || isSubmitting) {
+            return;
         }
+
+        if (username !== VALID_USERNAME || password !== VALID_PASSWORD) {
+            setError("Invalid credentials. Use username “Maria” and password “Any”.");
+            return;
+        }
+
+        setError("");
+        setIsSubmitting(true);
+        login(username);
     };
 
     return (
@@ -71,6 +83,13 @@ export default function LoginPage() {
                             </div>
                         </div>
 
+                        {error && (
+                            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2 animate-fade-in-up">
+                                <Lock size={16} />
+                                <span>{error}</span>
+                            </div>
+                        )}
+
                         <button
                             type="submit"
                             disabled={isSubmitting}
@@ -98,7 +117,7 @@ export default function LoginPage() {
                         </div>
                         <div className="text-center">
                             <p className="text-xs text-slate-500 dark:text-slate-400">
-                                Demo Credentials: any username / any password
+                                Demo Credentials: Username “Maria” • Password “Any”
                             </p>
                         </div>
                     </div>
