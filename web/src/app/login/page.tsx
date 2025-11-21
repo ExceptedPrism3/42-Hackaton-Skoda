@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "@/context/auth-context";
 import { Lock, User, ArrowRight, HelpCircle } from "lucide-react";
 
-const VALID_USERNAME = "Maria";
-const VALID_PASSWORD = "Any";
+const REQUIRED_USERNAME = process.env.NEXT_PUBLIC_LOGIN_USERNAME || "";
+const REQUIRED_PASSWORD = process.env.NEXT_PUBLIC_LOGIN_PASSWORD || "";
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const { login } = useAuth();
+    const isLoginConfigured = useMemo(
+        () => Boolean(REQUIRED_USERNAME && REQUIRED_PASSWORD),
+        []
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,10 +24,17 @@ export default function LoginPage() {
             return;
         }
 
-        if (username !== VALID_USERNAME || password !== VALID_PASSWORD) {
+        if (!isLoginConfigured) {
+            setErrorMessage("Login is temporarily unavailable. Please contact the administrator.");
             return;
         }
 
+        if (username !== REQUIRED_USERNAME || password !== REQUIRED_PASSWORD) {
+            setErrorMessage("Invalid username or password.");
+            return;
+        }
+
+        setErrorMessage("");
         setIsSubmitting(true);
         login(username);
     };
@@ -79,6 +91,13 @@ export default function LoginPage() {
                                 />
                             </div>
                         </div>
+
+                        {errorMessage && (
+                            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2 animate-fade-in-up">
+                                <Lock size={16} />
+                                <span>{errorMessage}</span>
+                            </div>
+                        )}
 
                         <button
                             type="submit"

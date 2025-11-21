@@ -86,12 +86,26 @@ The project consists of two main components:
    npm install
    ```
 
-5. **Run the development server**
+5. **Configure environment variables**
+
+   Create a `.env.local` file inside the `web/` directory:
+   ```bash
+   cd web
+   cp .env.local.example .env.local  # if the example file exists
+   ```
+   Or create it manually with:
+   ```
+   NEXT_PUBLIC_LOGIN_USERNAME=Maria
+   NEXT_PUBLIC_LOGIN_PASSWORD=Any
+   ```
+   (Use your own secure credentials in production.)
+
+6. **Run the development server**
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**
+7. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ### Demo Credentials
@@ -166,6 +180,7 @@ To deploy the application on an Ubuntu server with Apache as a reverse proxy:
 
 - **Port Configuration**: The app uses port 3002 by default. Make sure this port is available or update `ecosystem.config.js` and Apache configuration accordingly.
 - **Base Path**: The application is configured to run under `/skoda` subpath. To change this, update `NEXT_PUBLIC_BASE_PATH` in both the build command and `ecosystem.config.js`.
+- **Login Credentials**: Set `NEXT_PUBLIC_LOGIN_USERNAME` and `NEXT_PUBLIC_LOGIN_PASSWORD` (preferably via `.env.local`) before building so the login page can validate against them.
 - **SSL/HTTPS**: If you have SSL certificates, ensure your Apache SSL VirtualHost includes the `/skoda` location blocks (the setup script handles this automatically).
 - **Data Files**: Place your data files in the `data/` folder before running the setup script, or run the data ingestion manually after setup.
 
