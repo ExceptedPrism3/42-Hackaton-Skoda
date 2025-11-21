@@ -77,7 +77,7 @@ export default function FeedPage() {
                 duration: 3000,
             });
         }
-        
+
         // Open the modal
         setActiveModule(course);
     };
@@ -109,7 +109,7 @@ export default function FeedPage() {
 
     const filteredCourses = useMemo(() => {
         let filtered = courses;
-        
+
         // Filter by tab
         if (activeTab !== "all") {
             const categoryMap: Record<string, string> = {
@@ -119,11 +119,11 @@ export default function FeedPage() {
             };
             filtered = filtered.filter(course => course.category === categoryMap[activeTab]);
         }
-        
+
         // Filter by search term
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
-            filtered = filtered.filter(course => 
+            filtered = filtered.filter(course =>
                 course.title.toLowerCase().includes(searchLower) ||
                 course.topic?.toLowerCase().includes(searchLower) ||
                 course.source?.toLowerCase().includes(searchLower) ||
@@ -131,7 +131,7 @@ export default function FeedPage() {
                 course.category?.toLowerCase().includes(searchLower)
             );
         }
-        
+
         return filtered;
     }, [activeTab, searchTerm]);
 
@@ -142,6 +142,45 @@ export default function FeedPage() {
         { id: "leadership" as const, label: "Leadership", count: categorySummary["Leadership & Management"] || 0 },
     ];
 
+    const [streak, setStreak] = useState(0);
+
+    // Load streak from localStorage
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const storedStreak = parseInt(localStorage.getItem("learning_streak") || "0");
+            const lastVisit = localStorage.getItem("last_visit_date");
+            const today = new Date().toISOString().split('T')[0];
+
+            if (lastVisit === today) {
+                setStreak(storedStreak);
+            } else if (lastVisit) {
+                const lastDate = new Date(lastVisit);
+                const currentDate = new Date(today);
+                const diffTime = Math.abs(currentDate.getTime() - lastDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) {
+                    const newStreak = storedStreak + 1;
+                    setStreak(newStreak);
+                    localStorage.setItem("learning_streak", newStreak.toString());
+                    toast.success("Streak Increased!", {
+                        description: `You're on a ${newStreak}-day learning streak! 🔥`,
+                        duration: 3000,
+                    });
+                } else {
+                    setStreak(1);
+                    localStorage.setItem("learning_streak", "1");
+                }
+            } else {
+                setStreak(1);
+                localStorage.setItem("learning_streak", "1");
+            }
+            localStorage.setItem("last_visit_date", today);
+        }
+    }, []);
+
+    // ... existing code ...
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
@@ -150,6 +189,12 @@ export default function FeedPage() {
                     <p className="text-slate-500 dark:text-slate-400">Micro-modules across Škoda Academy tracks.</p>
                 </div>
                 <div className="flex gap-2 items-center">
+                    {/* Streak Counter */}
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-sm font-bold border border-orange-200 dark:border-orange-800/50" title="Daily Learning Streak">
+                        <span className="text-lg">🔥</span>
+                        <span>{streak}</span>
+                    </div>
+
                     <div className="relative">
                         <Search className="absolute left-3 top-3 text-slate-400" size={18} />
                         <input
@@ -160,7 +205,7 @@ export default function FeedPage() {
                             className="pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all"
                         />
                     </div>
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                    <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-medium border border-emerald-200 dark:border-emerald-800/50">
                         {filteredCourses.length} Modules
                     </span>
                 </div>
@@ -172,11 +217,10 @@ export default function FeedPage() {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 font-medium transition-colors border-b-2 whitespace-nowrap ${
-                            activeTab === tab.id
+                        className={`px-4 py-2 font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === tab.id
                                 ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
                                 : "border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
-                        }`}
+                            }`}
                     >
                         {tab.label}
                         <span className="ml-2 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full text-xs">
@@ -235,15 +279,14 @@ export default function FeedPage() {
                                 <Clock size={14} />
                                 <span>{course.content_type || "Micro-learning"}</span>
                             </div>
-                            <button 
+                            <button
                                 onClick={() => handleStartModule(course)}
-                                className={`text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all ${
-                                    completedModules.has(course.title)
+                                className={`text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all ${completedModules.has(course.title)
                                         ? "text-emerald-600 dark:text-emerald-400"
                                         : startedModules.has(course.title)
-                                        ? "text-amber-600 dark:text-amber-400"
-                                        : "text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
-                                }`}
+                                            ? "text-amber-600 dark:text-amber-400"
+                                            : "text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                                    }`}
                             >
                                 {completedModules.has(course.title) ? (
                                     <>
@@ -332,7 +375,7 @@ export default function FeedPage() {
                                     <h4 className="text-md font-semibold text-slate-900 dark:text-slate-100">
                                         Course Content
                                     </h4>
-                                    
+
                                     {/* Section 1: Introduction */}
                                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-800">
                                         <div className="flex items-center gap-3 mb-3">
@@ -446,9 +489,8 @@ export default function FeedPage() {
                             )}
                             <button
                                 onClick={() => setActiveModule(null)}
-                                className={`px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors ${
-                                    completedModules.has(activeModule.title) ? "flex-1" : ""
-                                }`}
+                                className={`px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors ${completedModules.has(activeModule.title) ? "flex-1" : ""
+                                    }`}
                             >
                                 {completedModules.has(activeModule.title) ? "Close" : "Continue Later"}
                             </button>
