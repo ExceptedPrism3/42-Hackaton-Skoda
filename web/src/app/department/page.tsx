@@ -16,9 +16,36 @@ export default function DepartmentOverviewPage() {
         const dept = departments[user.department];
         dept.count++;
 
-        // Calculate health based on average skill level
-        // Beginner = 1, Intermediate = 2, Advanced = 3
-        // Max score = 3 * number of skills
+        // Define expected skill levels by role (Shared logic)
+        const ROLE_EXPECTATIONS: Record<string, Record<string, string>> = {
+            "Senior": { "Compliance Mindset": "advanced", "Storytelling with Slides": "intermediate", "Excel Automation": "intermediate", "Project Delivery": "advanced" },
+            "Junior": { "Compliance Mindset": "intermediate", "Storytelling with Slides": "beginner", "Excel Automation": "beginner" },
+            "Manager": { "Compliance Mindset": "advanced", "Storytelling with Slides": "advanced", "People Operations": "advanced", "Project Delivery": "advanced" },
+            "Specialist": { "Compliance Mindset": "intermediate", "Storytelling with Slides": "intermediate", "Excel Automation": "advanced", "SAP Operations": "intermediate" }
+        };
+
+        // Helper to check if level is sufficient
+        const isGap = (current: string, expected: string) => {
+            const levels = ["beginner", "intermediate", "advanced"];
+            return levels.indexOf(current.toLowerCase()) < levels.indexOf(expected.toLowerCase());
+        };
+
+        const roleCategory = user.role.includes("Senior") ? "Senior" :
+            user.role.includes("Manager") ? "Manager" :
+                user.role.includes("Specialist") ? "Specialist" : "Junior";
+
+        const expectations = ROLE_EXPECTATIONS[roleCategory] || ROLE_EXPECTATIONS["Junior"];
+
+        let userGaps = 0;
+        Object.entries(user.skills || {}).forEach(([name, level]: [string, any]) => {
+            if (expectations[name] && isGap(level, expectations[name])) {
+                userGaps++;
+            }
+        });
+
+        if (userGaps > 0) dept.gaps++;
+
+        // Calculate health based on average skill level (Keep this for general health visualization)
         const skillLevels: Record<string, number> = { "beginner": 1, "intermediate": 2, "advanced": 3 };
         let totalScore = 0;
         let maxPossibleScore = 0;
@@ -28,9 +55,7 @@ export default function DepartmentOverviewPage() {
             maxPossibleScore += 3;
         });
 
-        // If average score is below 2 (Intermediate), consider it a "gap"
         const health = maxPossibleScore > 0 ? (totalScore / maxPossibleScore) : 0;
-        if (health < 0.66) dept.gaps++; // Less than 66% health is a gap
 
         // Store cumulative health for averaging later
         if (!dept.skills.health) dept.skills.health = 0;
