@@ -11,7 +11,6 @@ export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState("");
     const { login } = useAuth();
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -21,11 +20,9 @@ export default function LoginPage() {
         }
 
         if (username !== VALID_USERNAME || password !== VALID_PASSWORD) {
-            setError("Invalid credentials. Use username “Maria” and password “Any”.");
             return;
         }
 
-        setError("");
         setIsSubmitting(true);
         login(username);
     };
@@ -83,13 +80,6 @@ export default function LoginPage() {
                             </div>
                         </div>
 
-                        {error && (
-                            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2 animate-fade-in-up">
-                                <Lock size={16} />
-                                <span>{error}</span>
-                            </div>
-                        )}
-
                         <button
                             type="submit"
                             disabled={isSubmitting}
@@ -113,11 +103,6 @@ export default function LoginPage() {
                             <HelpCircle className="text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" size={16} />
                             <p className="text-xs text-blue-800 dark:text-blue-200 leading-relaxed">
                                 Forgot your password? Please contact the IT Support team for assistance with account recovery.
-                            </p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                                Demo Credentials: Username “Maria” • Password “Any”
                             </p>
                         </div>
                     </div>
