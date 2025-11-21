@@ -35,7 +35,7 @@ export default function SettingsPage() {
                                 </div>
 
                                 {/* Tooltip */}
-                                <div className="absolute bottom-full left-0 mb-1 w-64 p-2 bg-slate-800 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                <div className="absolute bottom-full left-0 mb-1 inline-flex p-2 bg-slate-800 text-white text-xs rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 max-w-xs">
                                     Only IT Team can modify user roles.
                                     <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-slate-800"></div>
                                 </div>
