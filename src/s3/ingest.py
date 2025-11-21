@@ -63,16 +63,16 @@ CATEGORY_KEYWORDS = {
 }
 
 SKILL_KEYWORDS = {
-    "excel": ("Excel Automation", "advanced"),
-    "powerpoint": ("Storytelling with Slides", "intermediate"),
-    "word": ("Word Templates", "intermediate"),
+    "excel": ("Excel Automation", "beginner"),
+    "powerpoint": ("Storytelling with Slides", "beginner"),
+    "word": ("Word Templates", "beginner"),
     "project": ("Project Delivery", "intermediate"),
-    "compliance": ("Compliance Mindset", "advanced"),
-    "quality": ("Quality Systems", "advanced"),
+    "compliance": ("Compliance Mindset", "intermediate"),
+    "quality": ("Quality Systems", "intermediate"),
     "python": ("Python Foundations", "beginner"),
-    "sap": ("SAP Operations", "intermediate"),
-    "safety": ("Workplace Safety", "advanced"),
-    "hr": ("People Operations", "advanced"),
+    "sap": ("SAP Operations", "beginner"),
+    "safety": ("Workplace Safety", "intermediate"),
+    "hr": ("People Operations", "intermediate"),
 }
 
 
