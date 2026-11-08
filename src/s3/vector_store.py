@@ -69,12 +69,18 @@ class VectorStore:
         self.nn.fit(self.matrix)
 
     def search(self, query: str, top_k: int = 5) -> List[ContentChunk]:
+        if top_k <= 0:
+            raise ValueError("top_k must be a positive integer")
+        if not self.chunks:
+            return []
+
         vec = self.embedder.transform([query])
-        distances, indices = self.nn.kneighbors(vec, n_neighbors=top_k)
+        distances, indices = self.nn.kneighbors(
+            vec, n_neighbors=min(top_k, len(self.chunks))
+        )
         results = []
         for dist, idx in zip(distances[0], indices[0]):
             chunk = self.chunks[idx]
             chunk.score = 1 - dist
             results.append(chunk)
         return results
-
