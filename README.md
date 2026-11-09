@@ -9,6 +9,19 @@
 
 S³ is a comprehensive HR and learning management system that helps Škoda Auto identify skill gaps, recommend personalized learning paths, and track employee development. The platform uses real organizational data to provide actionable insights for both employees and HR managers.
 
+## Hackathon Background
+
+- **Project:** S³ – Škoda Smart Stream
+- **Event:** AI Skill Coach Hackathon
+- **Location:** 42 Prague, Czech Republic
+- **Date:** November 2025
+- **Collaboration:** Škoda Auto × 42 Prague
+- **Team:** DO_IT, representing 42 Heilbronn
+
+The project was developed collaboratively by the hackathon team as a prototype exploring AI-powered learning and development.
+
+> **Restricted demo:** Demo access is restricted because the project uses internal company data. It is not a public demo; the local setup instructions below do not grant access to those datasets.
+
 ## ✨ Features
 
 ### For Employees
@@ -61,15 +74,15 @@ The project consists of two main components:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/Skoda.git
-   cd Skoda
+   git clone https://github.com/ExceptedPrism3/42-Hackaton-Skoda.git
+   cd 42-Hackaton-Skoda
    ```
 
 2. **Set up Python environment**
    ```bash
    # Install Poetry if you haven't already
    curl -sSL https://install.python-poetry.org | python3 -
-   
+
    # Install Python dependencies
    poetry install
    ```
@@ -90,7 +103,7 @@ The project consists of two main components:
 
    Create a `.env.local` file inside the `web/` directory:
    ```bash
-   cd web
+   # From the web/ directory entered in step 4
    cp .env.local.example .env.local  # if the example file exists
    ```
    Or create it manually with:
@@ -98,7 +111,7 @@ The project consists of two main components:
    NEXT_PUBLIC_LOGIN_USERNAME=Maria
    NEXT_PUBLIC_LOGIN_PASSWORD=Any
    ```
-   (Use your own secure credentials in production.)
+   These are demonstration values, not production credentials. Next.js exposes `NEXT_PUBLIC_*` variables to browser code; they must not contain secrets or be relied on to protect internal data.
 
 6. **Run the development server**
    ```bash
@@ -110,7 +123,7 @@ The project consists of two main components:
 
 ### Demo Credentials
 
-For the login page, you can use any username and password - it's a demo system.
+The login flow is a prototype demonstration, not production authentication. Use only synthetic or explicitly approved demo data in local testing; demo login must not be used to protect employee information or internal datasets.
 
 ## 🚀 Deployment
 
@@ -120,8 +133,8 @@ To deploy the application on an Ubuntu server with Apache as a reverse proxy:
 
 1. **Clone and navigate to the project**
    ```bash
-   git clone https://github.com/ExceptedPrism3/Skoda.git
-   cd Skoda
+   git clone https://github.com/ExceptedPrism3/42-Hackaton-Skoda.git
+   cd 42-Hackaton-Skoda
    ```
 
 2. **Run the automated setup script**
@@ -143,22 +156,24 @@ To deploy the application on an Ubuntu server with Apache as a reverse proxy:
 
    If you prefer manual setup or need to customize:
 
+   The PM2 commands below require `ecosystem.config.js`, which the automated setup script generates; it is not included in the repository. Prepare an equivalent configuration before using the manual path.
+
    ```bash
    # Set up Python environment
    python3 -m venv venv
    source venv/bin/activate
    pip install pandas transformers scikit-learn numpy scipy openpyxl sentencepiece pydantic
-   
+
    # Process data
    export PYTHONPATH="${PYTHONPATH}:$(pwd)/src"
    python -m s3.ingest
-   
+
    # Build Next.js app
    cd web
    npm install
    NEXT_PUBLIC_BASE_PATH=/skoda npm run build
    cd ..
-   
+
    # Start with PM2
    pm2 start ecosystem.config.js
    pm2 save
@@ -176,11 +191,13 @@ To deploy the application on an Ubuntu server with Apache as a reverse proxy:
    - HTTP: `http://your-server-ip/skoda`
    - HTTPS: `https://your-server-ip/skoda` (if SSL is configured)
 
+   HTTP is suitable only for isolated testing with non-sensitive data. Require HTTPS and production-grade authentication and authorization before any deployment handles internal or employee data.
+
 ### Important Notes
 
 - **Port Configuration**: The app uses port 3002 by default. Make sure this port is available or update `ecosystem.config.js` and Apache configuration accordingly.
 - **Base Path**: The application is configured to run under `/skoda` subpath. To change this, update `NEXT_PUBLIC_BASE_PATH` in both the build command and `ecosystem.config.js`.
-- **Login Credentials**: Set `NEXT_PUBLIC_LOGIN_USERNAME` and `NEXT_PUBLIC_LOGIN_PASSWORD` (preferably via `.env.local`) before building so the login page can validate against them.
+- **Demo Login Configuration**: `NEXT_PUBLIC_LOGIN_USERNAME` and `NEXT_PUBLIC_LOGIN_PASSWORD` are client-visible build-time settings, even when supplied via `.env.local`. They are not a security boundary; real authentication and authorization must be enforced server-side.
 - **SSL/HTTPS**: If you have SSL certificates, ensure your Apache SSL VirtualHost includes the `/skoda` location blocks (the setup script handles this automatically).
 - **Data Files**: Place your data files in the `data/` folder before running the setup script, or run the data ingestion manually after setup.
 
@@ -207,13 +224,15 @@ pm2 restart skoda-web
 
 The platform uses real Škoda Auto data from multiple sources:
 
-- **ERP Data** (`ERP_SK1.Start_month - SE.xlsx`) - Employee profiles, roles, education
-- **Training History** (`ZHRPD_VZD_STA_007.xlsx`, `ZHRPD_VZD_STA_016_RE_RHRHAZ00.xlsx`) - Course completions
-- **Degreed Platform** (`Degreed.xlsx`) - External learning platform data
-- **Skill Mapping** (`Skill_mapping.xlsx`) - Course-to-skill mappings
-- **Organizational Hierarchy** (`RLS.sa_org_hierarchy - SE.xlsx`) - Department structure
-- **Course Descriptions** (TXT files) - Multi-language course content
-- **Job Descriptions** (RE_RHRHAZ00 files) - Role-specific responsibilities
+> **Data handling:** Access to these sources requires authorization. Confirm that the source identifiers below are approved for public documentation. Do not publish raw employee records, generated employee JSON, or derived artifacts containing internal information; use only synthetic or explicitly approved data for public demonstrations.
+
+- **Employee Profile Data** - Employee profiles, roles, and education
+- **Training History** - Course completions
+- **External Learning Platform Data** - Learning resources from an external platform
+- **Skill Mapping** - Course-to-skill mappings
+- **Organizational Hierarchy** - Department structure
+- **Course Descriptions** - Multi-language course content
+- **Job Descriptions** - Role-specific responsibilities
 
 ## 🎯 Key Pages
 
@@ -243,7 +262,7 @@ The platform uses real Škoda Auto data from multiple sources:
 ## 📁 Project Structure
 
 ```
-Skoda/
+42-Hackaton-Skoda/
 ├── data/                          # Raw data files (Excel, TXT, PDF)
 ├── src/s3/                        # Python data processing
 │   ├── ingest.py                 # Main ingestion script
@@ -303,7 +322,7 @@ poetry run python -m src.s3.ingest
 
 ## 🔐 Authentication
 
-The platform uses a simple demo authentication system. In production, this would integrate with Škoda's SSO system.
+The platform uses a simple demo authentication system. Integration with an approved SSO system would be a production requirement, not an implemented feature. Demo login and client-visible settings do not provide production access control.
 
 ## 📝 License
 
@@ -315,9 +334,11 @@ This is a hackathon project for Škoda Auto. For questions or contributions, ple
 
 ## 🙏 Acknowledgments
 
-- **Škoda Auto** - For providing the dataset and hackathon opportunity
-- **42 Heilbronn × 42 Prague** - Hackathon organization
-- Built with ❤️ for better employee learning experiences
+- **Team DO_IT** - Collaborative development of the hackathon prototype, representing 42 Heilbronn.
+- **Škoda Auto × 42 Prague** - Collaboration on the AI Skill Coach Hackathon and its learning and development challenge.
+- **42 Heilbronn** - The institution represented by Team DO_IT.
+- **Repository contributors:** [ExceptedPrism3](https://github.com/ExceptedPrism3) and [LF-hub42](https://github.com/LF-hub42), both recorded in the local Git history. These repository contributors are not presented as the complete hackathon team.
+- Built with ❤️ for better employee learning experiences.
 
 ---
 
